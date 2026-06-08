@@ -1117,6 +1117,23 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
           </div>
         )}
       </div>
+      {/* Footer */}
+      <div style={{
+        borderTop: "1px solid rgba(0,0,0,0.07)",
+        padding: "18px 22px",
+        textAlign: "center",
+        marginTop: 12,
+      }}>
+        <p style={{ fontSize: 11, color: "#AAAAAA", fontFamily: "sans-serif", lineHeight: 1.7, margin: 0 }}>
+          Have a question or run into an issue?{" "}
+          <a href="mailto:info@realestatesolutionshub.com" style={{ color: "#0891B2", textDecoration: "none", fontWeight: 600 }}>
+            info@realestatesolutionshub.com
+          </a>
+        </p>
+        <p style={{ fontSize: 10, color: "#CCCCCC", fontFamily: "sans-serif", margin: "4px 0 0", letterSpacing: "0.05em" }}>
+          THE CONTENT READY AGENT · by Real Estate Solutions Hub
+        </p>
+      </div>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
