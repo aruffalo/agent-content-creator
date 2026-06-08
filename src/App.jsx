@@ -2,23 +2,30 @@ import { useState, useEffect } from "react";
 
 // ─── BRAND TOKENS ─────────────────────────────────────────────────────────────
 const B = {
-  black:      "#0A0A0A",
-  charcoal:   "#141414",
-  card:       "#1A1A1A",
-  border:     "rgba(255,255,255,0.06)",
-  borderGold: "rgba(184,151,90,0.35)",
-  white:      "#FFFFFF",
-  offWhite:   "#F5F2EE",
-  warmGray:   "#E0DBD4",
-  midGray:    "#8A8480",
-  lightGray:  "#C0BBB4",
-  gold:       "#B8975A",
-  goldLight:  "#D4B07A",
-  goldDim:    "rgba(184,151,90,0.10)",
-  goldDim2:   "rgba(184,151,90,0.18)",
-  red:        "rgba(200,70,70,0.15)",
-  redBorder:  "rgba(200,70,70,0.35)",
-  redText:    "#E88888",
+  black:       "#FFFFFF",
+  charcoal:    "#F8F9FA",
+  card:        "#FFFFFF",
+  border:      "rgba(0,0,0,0.08)",
+  borderGold:  "rgba(26,26,26,0.18)",
+  white:       "#1A1A1A",
+  offWhite:    "#1A1A1A",
+  warmGray:    "#3D3D3D",
+  midGray:     "#888888",
+  lightGray:   "#AAAAAA",
+  gold:        "#2D2D2D",
+  goldLight:   "#555555",
+  goldDim:     "rgba(0,0,0,0.04)",
+  goldDim2:    "rgba(0,0,0,0.09)",
+  red:         "rgba(200,70,70,0.08)",
+  redBorder:   "rgba(200,70,70,0.25)",
+  redText:     "#C0392B",
+  pageBg:      "#F4F5F7",
+  accent:      "#1A1A1A",
+  accentDim:   "rgba(26,26,26,0.07)",
+  accentDim2:  "rgba(26,26,26,0.12)",
+  teal:        "#0891B2",
+  tealDim:     "rgba(8,145,178,0.08)",
+  tealBorder:  "rgba(8,145,178,0.25)",
 };
 
 // ─── STORAGE (localStorage) ───────────────────────────────────────────────────
@@ -144,8 +151,8 @@ Reference their specific market, neighborhoods, and price ranges where relevant.
 // ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
 const inputStyle = {
   width: "100%", padding: "11px 13px",
-  background: "#111111",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "#FFFFFF",
+  border: "1px solid rgba(0,0,0,0.12)",
   borderRadius: 8, fontSize: 13, color: B.white,
   outline: "none", fontFamily: "sans-serif",
   boxSizing: "border-box",
@@ -153,7 +160,7 @@ const inputStyle = {
 
 const navBtnStyle = {
   padding: "6px 12px", borderRadius: 7, fontSize: 10, fontWeight: 700,
-  border: "1px solid rgba(255,255,255,0.1)", background: "transparent",
+  border: "1px solid rgba(0,0,0,0.1)", background: "#FFFFFF",
   color: B.midGray, cursor: "pointer", letterSpacing: "0.06em",
   fontFamily: "sans-serif",
 };
@@ -162,7 +169,7 @@ function GoldLabel({ children, style = {} }) {
   return (
     <div style={{
       fontSize: 10, fontWeight: 700, letterSpacing: "0.12em",
-      color: B.gold, textTransform: "uppercase", marginBottom: 8,
+      color: "#555555", textTransform: "uppercase", marginBottom: 8,
       fontFamily: "sans-serif", ...style,
     }}>{children}</div>
   );
@@ -171,9 +178,9 @@ function GoldLabel({ children, style = {} }) {
 function Block({ children, style = {} }) {
   return (
     <div style={{
-      background: B.black, border: `1px solid ${B.border}`,
+      background: "#F8F9FA", border: "1px solid rgba(0,0,0,0.08)",
       borderRadius: 10, padding: "13px 15px",
-      fontSize: 13, color: B.offWhite, lineHeight: 1.75,
+      fontSize: 13, color: "#1A1A1A", lineHeight: 1.75,
       fontFamily: "sans-serif", ...style,
     }}>{children}</div>
   );
@@ -212,17 +219,216 @@ function Tag({ children, active, onClick }) {
 
 function ScreenHeader({ title, subtitle, onBack }) {
   return (
-    <div style={{ background: B.charcoal, borderBottom: `1px solid ${B.border}`, padding: "18px 22px 16px" }}>
+    <div style={{ background: "#FFFFFF", borderBottom: "1px solid rgba(0,0,0,0.08)", padding: "18px 22px 16px" }}>
       {onBack && (
         <button onClick={onBack} style={{
-          background: "transparent", border: "none", color: B.midGray,
+          background: "transparent", border: "none", color: "#888888",
           fontSize: 11, fontWeight: 700, cursor: "pointer",
           letterSpacing: "0.07em", fontFamily: "sans-serif",
           marginBottom: 10, padding: 0, display: "block",
         }}>← BACK</button>
       )}
-      <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: B.white }}>{title}</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>{title}</h2>
       {subtitle && <p style={{ fontSize: 12, color: B.midGray, margin: "3px 0 0" }}>{subtitle}</p>}
+    </div>
+  );
+}
+
+// ─── CANVA HELPER ─────────────────────────────────────────────────────────────
+const CANVA_FONTS = {
+  "warm & approachable":      { heading: "Playfair Display", body: "Lato" },
+  "no-nonsense":              { heading: "Montserrat", body: "Open Sans" },
+  "educational":              { heading: "Merriweather", body: "Source Sans Pro" },
+  "peer-authority":           { heading: "Cormorant Garamond", body: "Raleway" },
+  "luxury lifestyle":         { heading: "Cormorant Garamond", body: "Raleway" },
+  "first-time buyer focused": { heading: "Nunito", body: "Lato" },
+  "relatable":                { heading: "Nunito", body: "Open Sans" },
+  "data-driven":              { heading: "Montserrat", body: "Roboto" },
+  "conversational":           { heading: "Poppins", body: "Lato" },
+  "bold & direct":            { heading: "Oswald", body: "Open Sans" },
+  "storyteller":              { heading: "Playfair Display", body: "Georgia" },
+  "community-first":          { heading: "Nunito", body: "Lato" },
+};
+
+const CANVA_URLS = {
+  reel:     "https://www.canva.com/design/DANew/new?type=MobileVideo&ratio=9:16",
+  carousel: "https://www.canva.com/design/DANew/new?type=Presentation",
+  static:   "https://www.canva.com/design/DANew/new?type=SocialMedia",
+};
+
+const CANVA_SEARCHES = {
+  reel:     "real estate reel 9x16",
+  carousel: "real estate carousel instagram",
+  static:   "real estate instagram post",
+};
+
+function CanvaSection({ format, data, profile }) {
+  const [open, setOpen] = useState(false);
+  const voiceTag = (profile?.voiceTags || [])[0] || "warm & approachable";
+  const fonts = CANVA_FONTS[voiceTag] || { heading: "Playfair Display", body: "Lato" };
+
+  // Build copy text per format
+  let copyText = "";
+  if (format === "reel") {
+    copyText = [
+      `HOOK:\n"${data.hook}"`,
+      `ON-SCREEN TEXT:\n${(data.onscreen || []).map((l, i) => `${i + 1}. ${l}`).join("\n")}`,
+      `VOICEOVER:\n${data.voiceover}`,
+      `CAPTION:\n${data.caption}`,
+    ].join("\n\n");
+  } else if (format === "carousel") {
+    const allSlides = [...(data.slides || []), ...(data.cta_slide ? [{ label: "CTA", headline: data.cta_slide.headline, body: data.cta_slide.body }] : [])];
+    copyText = [
+      `COVER HOOK:\n"${data.hook}"`,
+      ...allSlides.map((s, i) => `SLIDE ${i + 1} — ${s.label}\nHeadline: ${s.headline}\nBody: ${s.body}`),
+      `CAPTION:\n${data.caption}`,
+    ].join("\n\n");
+  } else if (format === "static") {
+    copyText = [
+      `HEADLINE (large text):\n${data.onscreen?.[0] || ""}`,
+      `SUPPORTING LINE:\n${data.onscreen?.[1] || ""}`,
+      `SUBTEXT (small):\n${data.subtext || ""}`,
+      `CAPTION:\n${data.caption}`,
+    ].join("\n\n");
+  }
+
+  return (
+    <div style={{
+      background: "#FFFFFF",
+      border: `1px solid ${open ? B.tealBorder : "rgba(8,145,178,0.15)"}`,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+      borderRadius: 12, overflow: "hidden",
+      marginTop: 4, transition: "border-color 0.2s",
+    }}>
+      {/* Header */}
+      <button onClick={() => setOpen(o => !o)} style={{
+        width: "100%", padding: "14px 16px",
+        background: "transparent", border: "none",
+        display: "flex", alignItems: "center", gap: 12,
+        cursor: "pointer", textAlign: "left",
+      }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 6, flexShrink: 0,
+          background: "linear-gradient(135deg, #0891B2, #0E7490)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14,
+        }}>✦</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#00C4CC", fontFamily: "sans-serif", letterSpacing: "0.05em" }}>
+            OPEN IN CANVA
+          </div>
+          <div style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif", marginTop: 1 }}>
+            Pre-sized template + copy-ready text
+          </div>
+        </div>
+        <span style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif" }}>{open ? "▲" : "▼"}</span>
+      </button>
+
+      {open && (
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "16px", display: "flex", flexDirection: "column", gap: 14 }}>
+
+          {/* Step 1 — Open Canva */}
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#00C4CC", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "sans-serif" }}>
+              STEP 1 — OPEN YOUR CANVAS
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <a href={CANVA_URLS[format]} target="_blank" rel="noopener noreferrer" style={{
+                flex: 1, padding: "10px 14px", borderRadius: 8, textAlign: "center",
+                background: "rgba(8,145,178,0.07)",
+                border: "1px solid rgba(8,145,178,0.25)",
+                color: "#0891B2", fontSize: 11, fontWeight: 700,
+                textDecoration: "none", fontFamily: "sans-serif",
+                letterSpacing: "0.06em", display: "block",
+              }}>
+                {format === "reel" ? "📱 Open 1080×1920 Blank" : "🖼️ Open 1080×1080 Blank"}
+              </a>
+              <a href={`https://www.canva.com/search/templates?q=${encodeURIComponent(CANVA_SEARCHES[format])}`}
+                target="_blank" rel="noopener noreferrer" style={{
+                  flex: 1, padding: "10px 14px", borderRadius: 8, textAlign: "center",
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: B.lightGray, fontSize: 11, fontWeight: 700,
+                  textDecoration: "none", fontFamily: "sans-serif",
+                  letterSpacing: "0.06em", display: "block",
+                }}>
+                🔍 Browse Templates
+              </a>
+            </div>
+          </div>
+
+          {/* Step 2 — Copy All Text */}
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#00C4CC", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "sans-serif" }}>
+              STEP 2 — COPY YOUR TEXT
+            </div>
+            <div style={{
+              background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.08)",
+              borderRadius: 8, padding: "12px 14px",
+              fontSize: 11, color: B.warmGray, lineHeight: 1.8,
+              fontFamily: "monospace", whiteSpace: "pre-wrap",
+              maxHeight: 180, overflowY: "auto",
+            }}>{copyText}</div>
+            <CopyBtn text={copyText} />
+          </div>
+
+          {/* Step 3 — Font Pairing */}
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#00C4CC", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "sans-serif" }}>
+              STEP 3 — FONT PAIRING FOR YOUR VOICE
+            </div>
+            <div style={{
+              background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.08)",
+              borderRadius: 8, padding: "12px 14px",
+              display: "flex", gap: 16,
+            }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 9, color: B.midGray, letterSpacing: "0.1em", marginBottom: 4, fontFamily: "sans-serif" }}>HEADING</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", fontFamily: "sans-serif" }}>{fonts.heading}</div>
+              </div>
+              <div style={{ width: 1, background: B.border }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 9, color: B.midGray, letterSpacing: "0.1em", marginBottom: 4, fontFamily: "sans-serif" }}>BODY</div>
+                <div style={{ fontSize: 13, color: B.warmGray, fontFamily: "sans-serif" }}>{fonts.body}</div>
+              </div>
+            </div>
+            <p style={{ fontSize: 10, color: B.midGray, margin: "6px 0 0", fontFamily: "sans-serif", lineHeight: 1.5 }}>
+              Search these in Canva's font selector — both are free on all plans.
+            </p>
+          </div>
+
+          {/* Step 4 — Design Tips */}
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#00C4CC", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "sans-serif" }}>
+              STEP 4 — QUICK DESIGN TIPS
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {(format === "reel" ? [
+                "Place your hook text in the top third of the frame — that's the first thing viewers see",
+                "Use a semi-transparent dark overlay behind text so it reads over any B-roll footage",
+                "Keep on-screen text to one line per frame — don't show all at once",
+                "Add your name/handle in the bottom corner on every slide",
+              ] : format === "carousel" ? [
+                "Slide 1 is your scroll-stopper — make the hook text as large as it can go",
+                "Keep each slide to ONE headline + 2-3 lines max — white space is your friend",
+                "Use the same background color or texture across all slides for brand consistency",
+                "End card (CTA slide) should have your headshot + contact info",
+              ] : [
+                "Your headline should be the largest element — at least 50% of the visual weight",
+                "Add your headshot in a corner circle for brand recognition",
+                "Use a solid or gradient background so text pops — avoid busy photo backgrounds",
+                "Include your handle and market name in small text at the bottom",
+              ]).map((tip, i) => (
+                <div key={i} style={{ display: "flex", gap: 9 }}>
+                  <span style={{ color: "#00C4CC", fontSize: 11, flexShrink: 0, paddingTop: 2, fontFamily: "sans-serif" }}>✦</span>
+                  <span style={{ fontSize: 11, color: B.midGray, lineHeight: 1.6, fontFamily: "sans-serif" }}>{tip}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      )}
     </div>
   );
 }
@@ -234,20 +440,20 @@ function ReelResult({ data, profile }) {
       <div>
         <GoldLabel>🎯 Hook</GoldLabel>
         <div style={{
-          background: B.black, border: `1px solid ${B.borderGold}`,
+          background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.1)",
           borderRadius: 10, padding: "14px 18px",
           fontSize: 17, fontWeight: 700,
           fontFamily: "Georgia, serif", fontStyle: "italic",
-          color: B.white, lineHeight: 1.35,
+          color: "#1A1A1A", lineHeight: 1.35,
         }}>"{data.hook}"</div>
       </div>
       <div>
         <GoldLabel>📝 On-Screen Text</GoldLabel>
         {(data.onscreen || []).map((line, i) => (
           <div key={i} style={{
-            background: B.black, border: `1px solid ${B.border}`,
+            background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.08)",
             borderRadius: 8, padding: "10px 14px", marginBottom: 6,
-            fontSize: 13, fontWeight: 700, color: B.white,
+            fontSize: 13, fontWeight: 700, color: "#1A1A1A",
             fontFamily: "Georgia, serif",
           }}>{line}</div>
         ))}
@@ -266,7 +472,7 @@ function ReelResult({ data, profile }) {
           <GoldLabel style={{ marginBottom: 0 }}>🎙️ Voiceover Script</GoldLabel>
           <CopyBtn text={data.voiceover} />
         </div>
-        <Block style={{ fontStyle: "italic", borderLeft: `3px solid ${B.gold}` }}>{data.voiceover}</Block>
+        <Block style={{ fontStyle: "italic", borderLeft: "3px solid #DDDDDD" }}>{data.voiceover}</Block>
       </div>
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
@@ -275,6 +481,7 @@ function ReelResult({ data, profile }) {
         </div>
         <Block>{data.caption}</Block>
       </div>
+      <CanvaSection format="reel" data={data} profile={profile} />
     </div>
   );
 }
@@ -290,11 +497,11 @@ function CarouselResult({ data }) {
       <div>
         <GoldLabel>🎯 Cover Hook</GoldLabel>
         <div style={{
-          background: B.black, border: `1px solid ${B.borderGold}`,
+          background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.1)",
           borderRadius: 10, padding: "14px 18px",
           fontSize: 17, fontWeight: 700,
           fontFamily: "Georgia, serif", fontStyle: "italic",
-          color: B.white, lineHeight: 1.35,
+          color: "#1A1A1A", lineHeight: 1.35,
         }}>"{data.hook}"</div>
       </div>
       <div>
@@ -312,12 +519,12 @@ function CarouselResult({ data }) {
         </div>
         {allSlides[active] && (
           <div style={{
-            background: B.black, border: `1px solid ${B.border}`,
+            background: "#F8F9FA", border: "1px solid rgba(0,0,0,0.08)",
             borderRadius: 12, padding: "20px",
-            borderLeft: `3px solid ${B.gold}`,
+            borderLeft: "3px solid #1A1A1A",
           }}>
-            <div style={{ fontSize: 10, color: B.gold, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10, fontFamily: "sans-serif" }}>{allSlides[active].label}</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: B.white, lineHeight: 1.35, marginBottom: 10, fontFamily: "Georgia, serif", fontStyle: "italic" }}>{allSlides[active].headline}</div>
+            <div style={{ fontSize: 10, color: "#888888", fontWeight: 700, letterSpacing: "0.1em", marginBottom: 10, fontFamily: "sans-serif" }}>{allSlides[active].label}</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "#1A1A1A", lineHeight: 1.35, marginBottom: 10, fontFamily: "Georgia, serif", fontStyle: "italic" }}>{allSlides[active].headline}</div>
             <div style={{ fontSize: 13, color: B.warmGray, lineHeight: 1.7, fontFamily: "sans-serif" }}>{allSlides[active].body}</div>
           </div>
         )}
@@ -329,6 +536,7 @@ function CarouselResult({ data }) {
         </div>
         <Block>{data.caption}</Block>
       </div>
+      <CanvaSection format="carousel" data={data} profile={{}} />
     </div>
   );
 }
@@ -340,7 +548,7 @@ function StaticResult({ data, profile }) {
         <GoldLabel>👁️ Post Preview</GoldLabel>
         <div style={{
           aspectRatio: "1/1", maxHeight: 280,
-          background: "#0D0D0D",
+          background: "#1A1A1A",
           border: `1px solid ${B.border}`,
           borderRadius: 12,
           display: "flex", flexDirection: "column",
@@ -379,6 +587,7 @@ function StaticResult({ data, profile }) {
         </div>
         <Block>{data.caption}</Block>
       </div>
+      <CanvaSection format="static" data={data} profile={profile} />
     </div>
   );
 }
@@ -401,9 +610,9 @@ function OnboardingScreen({ onComplete, existing }) {
   const canSave = form.name.trim() && form.market.trim() && agreed;
 
   return (
-    <div style={{ minHeight: "100vh", background: B.black, color: B.white, fontFamily: "sans-serif" }}>
-      <div style={{ background: B.charcoal, borderBottom: `1px solid ${B.border}`, padding: "20px 22px 18px" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: B.white }}>
+    <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A", fontFamily: "sans-serif" }}>
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid rgba(0,0,0,0.08)", padding: "20px 22px 18px" }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
           {existing ? "Edit Your Profile" : "Set Up Your Profile"}
         </h1>
         <p style={{ fontSize: 12, color: B.midGray, margin: "4px 0 0", lineHeight: 1.5 }}>
@@ -472,7 +681,7 @@ function OnboardingScreen({ onComplete, existing }) {
 
         {/* Disclosure */}
         <div style={{
-          background: "#0F0F0F",
+          background: "#FFFFFF",
           border: `1px solid ${agreed ? B.borderGold : "rgba(255,255,255,0.1)"}`,
           borderRadius: 12, overflow: "hidden", transition: "border-color 0.2s",
         }}>
@@ -525,7 +734,7 @@ function OnboardingScreen({ onComplete, existing }) {
                 <div key={i} style={{ display: "flex", gap: 11 }}>
                   <span style={{ fontSize: 14, flexShrink: 0, paddingTop: 1 }}>{item.icon}</span>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: B.offWhite, fontFamily: "sans-serif", marginBottom: 4 }}>{item.title}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#1A1A1A", fontFamily: "sans-serif", marginBottom: 4 }}>{item.title}</div>
                     <div style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif", lineHeight: 1.65 }}>{item.body}</div>
                   </div>
                 </div>
@@ -537,18 +746,18 @@ function OnboardingScreen({ onComplete, existing }) {
             borderTop: "1px solid rgba(255,255,255,0.06)",
             padding: "13px 16px",
             display: "flex", alignItems: "flex-start", gap: 11,
-            background: agreed ? B.goldDim : "transparent",
+            background: agreed ? "rgba(26,26,26,0.04)" : "transparent",
             transition: "background 0.2s",
           }}>
             <div onClick={() => setAgreed(a => !a)} style={{
               width: 18, height: 18, borderRadius: 5, flexShrink: 0,
-              border: `2px solid ${agreed ? B.gold : "rgba(255,255,255,0.2)"}`,
-              background: agreed ? B.gold : "transparent",
+              border: `2px solid ${agreed ? "#1A1A1A" : "rgba(0,0,0,0.2)"}`,
+              background: agreed ? "#1A1A1A" : "transparent",
               cursor: "pointer", marginTop: 1,
               display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.15s",
             }}>
-              {agreed && <span style={{ fontSize: 11, color: B.black, fontWeight: 900, lineHeight: 1 }}>✓</span>}
+              {agreed && <span style={{ fontSize: 11, color: "#FFFFFF", fontWeight: 900, lineHeight: 1 }}>✓</span>}
             </div>
             <label onClick={() => setAgreed(a => !a)} style={{
               fontSize: 12, color: agreed ? B.warmGray : B.midGray,
@@ -561,8 +770,8 @@ function OnboardingScreen({ onComplete, existing }) {
 
         <button onClick={() => canSave && onComplete(form)} disabled={!canSave} style={{
           padding: "14px", borderRadius: 10,
-          background: canSave ? B.gold : "#3A3228",
-          color: canSave ? B.black : B.midGray,
+          background: canSave ? "#1A1A1A" : "#E5E7EB",
+          color: canSave ? "#FFFFFF" : "#AAAAAA",
           border: "none", fontSize: 12, fontWeight: 800,
           cursor: canSave ? "pointer" : "not-allowed",
           letterSpacing: "0.1em", fontFamily: "sans-serif",
@@ -574,7 +783,7 @@ function OnboardingScreen({ onComplete, existing }) {
         {existing && (
           <button onClick={() => onComplete(null)} style={{
             padding: "10px", borderRadius: 10, background: "transparent",
-            border: `1px solid ${B.border}`, color: B.midGray,
+            border: "1px solid rgba(0,0,0,0.1)", color: "#888888",
             fontSize: 11, fontWeight: 700, cursor: "pointer",
             letterSpacing: "0.06em", fontFamily: "sans-serif",
           }}>← CANCEL</button>
@@ -592,7 +801,7 @@ function HistoryScreen({ history, onBack, onRestore }) {
 
   if (history.length === 0) {
     return (
-      <div style={{ minHeight: "100vh", background: B.black, color: B.white }}>
+      <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A" }}>
         <ScreenHeader title="Content History" subtitle="Your generated content will appear here." onBack={onBack} />
         <div style={{ padding: "40px 22px", textAlign: "center", color: B.midGray, fontSize: 13, fontFamily: "sans-serif" }}>
           No history yet — generate your first piece of content to see it here.
@@ -602,7 +811,7 @@ function HistoryScreen({ history, onBack, onRestore }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: B.black, color: B.white }}>
+    <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A" }}>
       <ScreenHeader title="Content History" subtitle={`${history.length} piece${history.length !== 1 ? "s" : ""} saved`} onBack={onBack} />
       <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
         {[...history].reverse().map((item, i) => {
@@ -610,18 +819,19 @@ function HistoryScreen({ history, onBack, onRestore }) {
           const pillarObj = PILLAR_OPTIONS.find(p => p.id === item.pillar);
           return (
             <div key={i} style={{
-              background: B.card, border: `1px solid ${isOpen ? B.borderGold : B.border}`,
+              background: "#FFFFFF", border: `1px solid ${isOpen ? "rgba(26,26,26,0.25)" : "rgba(0,0,0,0.08)"}`,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
               borderRadius: 12, overflow: "hidden", transition: "border-color 0.2s",
             }}>
               <button onClick={() => setExpanded(isOpen ? null : i)} style={{
                 width: "100%", padding: "14px 16px",
-                background: "transparent", border: "none",
+                background: "#FFFFFF", border: "none",
                 display: "flex", alignItems: "center", gap: 12,
                 cursor: "pointer", textAlign: "left",
               }}>
                 <span style={{ fontSize: 16 }}>{fmtIcon[item.format] || "✦"}</span>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: B.white, fontFamily: "sans-serif", marginBottom: 3 }}>{item.topic}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", fontFamily: "sans-serif", marginBottom: 3 }}>{item.topic}</div>
                   <div style={{ fontSize: 10, color: B.midGray, fontFamily: "sans-serif", letterSpacing: "0.05em" }}>
                     {pillarObj?.icon} {pillarObj?.label} · {item.format} · {fmt(item.timestamp)}
                   </div>
@@ -637,8 +847,8 @@ function HistoryScreen({ history, onBack, onRestore }) {
                   </div>
                   <button onClick={() => onRestore(item)} style={{
                     width: "100%", padding: "10px",
-                    background: B.goldDim, border: `1px solid ${B.borderGold}`,
-                    borderRadius: 8, color: B.gold,
+                    background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.1)",
+                    borderRadius: 8, color: "#1A1A1A",
                     fontSize: 11, fontWeight: 700, cursor: "pointer",
                     letterSpacing: "0.06em", fontFamily: "sans-serif",
                   }}>↗ RESTORE TO GENERATOR</button>
@@ -664,18 +874,18 @@ function DuplicateWarning({ matches, onContinue, onViewOriginal }) {
       </div>
       {matches.map((m, i) => (
         <div key={i} style={{
-          background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: "9px 12px",
+          background: "rgba(0,0,0,0.04)", borderRadius: 8, padding: "9px 12px",
           marginBottom: 8, fontSize: 12, color: B.offWhite, fontFamily: "sans-serif",
         }}>
-          <span style={{ fontWeight: 700 }}>{m.topic}</span>
-          <span style={{ color: B.midGray }}> · {m.format} · {new Date(m.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+          <span style={{ fontWeight: 700, color: "#1A1A1A" }}>{m.topic}</span>
+          <span style={{ color: "#888888" }}> · {m.format} · {new Date(m.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         </div>
       ))}
       <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
         <button onClick={onContinue} style={{
           flex: 1, padding: "10px", borderRadius: 8,
-          background: B.goldDim2, border: `1px solid ${B.borderGold}`,
-          color: B.gold, fontSize: 11, fontWeight: 700,
+          background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.15)",
+          color: "#1A1A1A", fontSize: 11, fontWeight: 700,
           cursor: "pointer", letterSpacing: "0.06em", fontFamily: "sans-serif",
         }}>GENERATE NEW ANGLE ✦</button>
         <button onClick={onViewOriginal} style={{
@@ -747,13 +957,13 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: B.black, color: B.white, fontFamily: "sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A", fontFamily: "sans-serif" }}>
       {/* Header */}
-      <div style={{ background: B.charcoal, borderBottom: `1px solid ${B.border}`, padding: "16px 22px 14px" }}>
+      <div style={{ background: "#FFFFFF", borderBottom: `1px solid ${B.border}`, padding: "16px 22px 14px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
-              <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: B.white }}>
+              <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
                 Content Creator
               </h1>
               <span style={{ fontSize: 9, color: B.gold, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>by RESH</span>
@@ -793,8 +1003,8 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
               <button key={f.id} onClick={() => setFormat(f.id)} style={{
                 display: "flex", alignItems: "flex-start", gap: 12,
                 padding: "11px 14px", borderRadius: 10, textAlign: "left",
-                border: `1px solid ${format === f.id ? B.gold : B.border}`,
-                background: format === f.id ? B.goldDim : B.card,
+                border: `1px solid ${format === f.id ? "#1A1A1A" : "rgba(0,0,0,0.08)"}`,
+                background: format === f.id ? "rgba(26,26,26,0.06)" : "#FFFFFF",
                 cursor: "pointer", transition: "all 0.15s",
               }}>
                 <span style={{ fontSize: 17, lineHeight: 1.2 }}>{f.icon}</span>
@@ -818,8 +1028,8 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
               placeholder="e.g. why buyers lose bidding wars, down payment myths, Rincon Valley..."
               style={{
                 flex: 1, padding: "12px 14px",
-                background: "#111111",
-                border: `1px solid ${B.gold}`,
+                background: "#FFFFFF",
+                border: "1px solid #1A1A1A",
                 borderRight: "none",
                 borderRadius: "9px 0 0 9px",
                 fontSize: 13, color: B.white, outline: "none", fontFamily: "sans-serif",
@@ -827,8 +1037,8 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
             />
             <button onClick={handleGenerate} disabled={loading || !topic.trim()} style={{
               padding: "12px 16px",
-              background: loading ? "#4A3A1E" : B.gold,
-              color: loading ? B.midGray : B.black,
+              background: loading ? "#E5E7EB" : "#1A1A1A",
+              color: loading ? "#888888" : "#FFFFFF",
               border: "none", borderRadius: "0 9px 9px 0",
               fontSize: 11, fontWeight: 800,
               cursor: loading || !topic.trim() ? "not-allowed" : "pointer",
@@ -854,7 +1064,7 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
 
         {loading && (
           <div style={{ padding: "32px", textAlign: "center", background: B.card, borderRadius: 12, border: `1px solid ${B.border}` }}>
-            <div style={{ fontSize: 22, marginBottom: 10, display: "inline-block", animation: "spin 3s linear infinite" }}>✦</div>
+            <div style={{ fontSize: 22, marginBottom: 10, display: "inline-block", animation: "spin 3s linear infinite", color: "#1A1A1A" }}>✦</div>
             <div style={{ fontSize: 13, color: B.midGray, fontFamily: "sans-serif" }}>
               Writing your {selFmt?.label} as {profile.name}…
             </div>
@@ -880,9 +1090,9 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
             {format === "static"   && <StaticResult   data={result} profile={profile} />}
             <button onClick={() => doGenerate("generate a completely different angle or approach")} style={{
               marginTop: 18, width: "100%", padding: "11px",
-              background: "transparent", border: `1px solid ${B.border}`,
+              background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)",
               borderRadius: 10, fontSize: 11, fontWeight: 700,
-              color: B.midGray, cursor: "pointer",
+              color: "#888888", cursor: "pointer",
               letterSpacing: "0.06em", fontFamily: "sans-serif",
             }}>↺ REGENERATE WITH DIFFERENT ANGLE</button>
           </div>
@@ -916,7 +1126,7 @@ export default function App() {
 
   if (screen === "loading") {
     return (
-      <div style={{ minHeight: "100vh", background: B.black, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: B.pageBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ fontSize: 13, color: B.midGray, fontFamily: "sans-serif", letterSpacing: "0.1em" }}>LOADING…</div>
       </div>
     );
