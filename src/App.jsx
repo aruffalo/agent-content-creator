@@ -180,7 +180,7 @@ const inputStyle = {
 const navBtnStyle = {
   padding: "6px 12px", borderRadius: 7, fontSize: 10, fontWeight: 700,
   border: "1px solid rgba(0,0,0,0.1)", background: "#FFFFFF",
-  color: B.midGray, cursor: "pointer", letterSpacing: "0.06em",
+  color: "#888888", cursor: "pointer", letterSpacing: "0.06em",
   fontFamily: "sans-serif",
 };
 
@@ -248,7 +248,7 @@ function ScreenHeader({ title, subtitle, onBack }) {
         }}>← BACK</button>
       )}
       <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>{title}</h2>
-      {subtitle && <p style={{ fontSize: 12, color: B.midGray, margin: "3px 0 0" }}>{subtitle}</p>}
+      {subtitle && <p style={{ fontSize: 12, color: "#888888", margin: "3px 0 0" }}>{subtitle}</p>}
     </div>
   );
 }
@@ -333,14 +333,14 @@ function CanvaSection({ format, data, profile }) {
           fontSize: 14,
         }}>✦</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#00C4CC", fontFamily: "sans-serif", letterSpacing: "0.05em" }}>
-            OPEN IN CANVA
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#0891B2", fontFamily: "sans-serif", letterSpacing: "0.05em" }}>
+            DESIGN IN CANVA
           </div>
-          <div style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif", marginTop: 1 }}>
-            Pre-sized template + copy-ready text
+          <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", marginTop: 1 }}>
+            Canva-ready text, templates & design tips
           </div>
         </div>
-        <span style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif" }}>{open ? "▲" : "▼"}</span>
+        <span style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif" }}>{open ? "▲" : "▼"}</span>
       </button>
 
       {open && (
@@ -402,16 +402,16 @@ function CanvaSection({ format, data, profile }) {
               display: "flex", gap: 16,
             }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 9, color: B.midGray, letterSpacing: "0.1em", marginBottom: 4, fontFamily: "sans-serif" }}>HEADING</div>
+                <div style={{ fontSize: 9, color: "#888888", letterSpacing: "0.1em", marginBottom: 4, fontFamily: "sans-serif" }}>HEADING</div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", fontFamily: "sans-serif" }}>{fonts.heading}</div>
               </div>
               <div style={{ width: 1, background: B.border }} />
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 9, color: B.midGray, letterSpacing: "0.1em", marginBottom: 4, fontFamily: "sans-serif" }}>BODY</div>
+                <div style={{ fontSize: 9, color: "#888888", letterSpacing: "0.1em", marginBottom: 4, fontFamily: "sans-serif" }}>BODY</div>
                 <div style={{ fontSize: 13, color: B.warmGray, fontFamily: "sans-serif" }}>{fonts.body}</div>
               </div>
             </div>
-            <p style={{ fontSize: 10, color: B.midGray, margin: "6px 0 0", fontFamily: "sans-serif", lineHeight: 1.5 }}>
+            <p style={{ fontSize: 10, color: "#888888", margin: "6px 0 0", fontFamily: "sans-serif", lineHeight: 1.5 }}>
               Search these in Canva's font selector — both are free on all plans.
             </p>
           </div>
@@ -440,7 +440,7 @@ function CanvaSection({ format, data, profile }) {
               ]).map((tip, i) => (
                 <div key={i} style={{ display: "flex", gap: 9 }}>
                   <span style={{ color: "#00C4CC", fontSize: 11, flexShrink: 0, paddingTop: 2, fontFamily: "sans-serif" }}>✦</span>
-                  <span style={{ fontSize: 11, color: B.midGray, lineHeight: 1.6, fontFamily: "sans-serif" }}>{tip}</span>
+                  <span style={{ fontSize: 11, color: "#888888", lineHeight: 1.6, fontFamily: "sans-serif" }}>{tip}</span>
                 </div>
               ))}
             </div>
@@ -481,7 +481,7 @@ function ReelResult({ data, profile }) {
         <GoldLabel>🎬 B-Roll Shot List</GoldLabel>
         {(data.broll || []).map((shot, i) => (
           <div key={i} style={{ display: "flex", gap: 10, marginBottom: 6 }}>
-            <span style={{ color: B.gold, fontSize: 12, fontWeight: 700, minWidth: 18, fontFamily: "sans-serif", paddingTop: 2 }}>{i + 1}.</span>
+            <span style={{ color: "#2D2D2D", fontSize: 12, fontWeight: 700, minWidth: 18, fontFamily: "sans-serif", paddingTop: 2 }}>{i + 1}.</span>
             <span style={{ fontSize: 13, color: B.offWhite, lineHeight: 1.6, fontFamily: "sans-serif" }}>{shot}</span>
           </div>
         ))}
@@ -589,13 +589,13 @@ function StaticResult({ data, profile }) {
             }}>{line}</div>
           ))}
           {data.subtext && (
-            <div style={{ fontSize: 11, color: B.midGray, textAlign: "center", fontFamily: "sans-serif", marginTop: 4 }}>{data.subtext}</div>
+            <div style={{ fontSize: 11, color: "#888888", textAlign: "center", fontFamily: "sans-serif", marginTop: 4 }}>{data.subtext}</div>
           )}
           <div style={{ position: "absolute", bottom: 14, left: 0, right: 0, display: "flex", justifyContent: "space-between", padding: "0 18px" }}>
-            <span style={{ fontSize: 9, color: B.gold, letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "sans-serif", fontWeight: 700 }}>
+            <span style={{ fontSize: 9, color: "#2D2D2D", letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "sans-serif", fontWeight: 700 }}>
               {profile?.name || "YOUR NAME"}
             </span>
-            <span style={{ fontSize: 9, color: B.midGray, fontFamily: "sans-serif" }}>{profile?.market || ""}</span>
+            <span style={{ fontSize: 9, color: "#888888", fontFamily: "sans-serif" }}>{profile?.market || ""}</span>
           </div>
         </div>
       </div>
@@ -634,7 +634,7 @@ function OnboardingScreen({ onComplete, existing }) {
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
           {existing ? "Edit Your Profile" : "Set Up Your Profile"}
         </h1>
-        <p style={{ fontSize: 12, color: B.midGray, margin: "4px 0 0", lineHeight: 1.5 }}>
+        <p style={{ fontSize: 12, color: "#888888", margin: "4px 0 0", lineHeight: 1.5 }}>
           {existing
             ? "Update your details — all future content will reflect the changes."
             : "Fill this out once and every piece of content will be written in your voice, for your market."}
@@ -666,7 +666,7 @@ function OnboardingScreen({ onComplete, existing }) {
           <GoldLabel>Neighborhoods & Areas You Specialize In</GoldLabel>
           <input value={form.neighborhoods} onChange={e => set("neighborhoods", e.target.value)}
             placeholder="e.g. Old Town, Arcadia, Paradise Valley, North Scottsdale" style={inputStyle} />
-          <p style={{ fontSize: 11, color: B.midGray, margin: "5px 0 0" }}>The AI will reference these naturally in your content.</p>
+          <p style={{ fontSize: 11, color: "#888888", margin: "5px 0 0" }}>The AI will reference these naturally in your content.</p>
         </div>
 
         <div>
@@ -686,7 +686,7 @@ function OnboardingScreen({ onComplete, existing }) {
               </Tag>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: B.midGray, margin: "6px 0 0" }}>Selected: {(form.voiceTags || []).length}/4</p>
+          <p style={{ fontSize: 11, color: "#888888", margin: "6px 0 0" }}>Selected: {(form.voiceTags || []).length}/4</p>
         </div>
 
         <div>
@@ -709,14 +709,14 @@ function OnboardingScreen({ onComplete, existing }) {
               <div style={{ fontSize: 11, fontWeight: 700, color: B.offWhite, fontFamily: "sans-serif", marginBottom: 3, letterSpacing: "0.03em" }}>
                 🔒 Data & Privacy Disclosure
               </div>
-              <div style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif", lineHeight: 1.55 }}>
+              <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", lineHeight: 1.55 }}>
                 Please read before saving your profile.
               </div>
             </div>
             <button onClick={() => setDisclosureOpen(o => !o)} style={{
               background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: 6, padding: "4px 10px", fontSize: 10, fontWeight: 700,
-              color: B.midGray, cursor: "pointer", fontFamily: "sans-serif",
+              color: "#888888", cursor: "pointer", fontFamily: "sans-serif",
               letterSpacing: "0.05em", whiteSpace: "nowrap", flexShrink: 0,
             }}>{disclosureOpen ? "HIDE ▲" : "READ ▼"}</button>
           </div>
@@ -754,7 +754,7 @@ function OnboardingScreen({ onComplete, existing }) {
                   <span style={{ fontSize: 14, flexShrink: 0, paddingTop: 1 }}>{item.icon}</span>
                   <div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#1A1A1A", fontFamily: "sans-serif", marginBottom: 4 }}>{item.title}</div>
-                    <div style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif", lineHeight: 1.65 }}>{item.body}</div>
+                    <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", lineHeight: 1.65 }}>{item.body}</div>
                   </div>
                 </div>
               ))}
@@ -822,7 +822,7 @@ function HistoryScreen({ history, onBack, onRestore }) {
     return (
       <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A" }}>
         <ScreenHeader title="Content History" subtitle="Your generated content will appear here." onBack={onBack} />
-        <div style={{ padding: "40px 22px", textAlign: "center", color: B.midGray, fontSize: 13, fontFamily: "sans-serif" }}>
+        <div style={{ padding: "40px 22px", textAlign: "center", color: "#888888", fontSize: 13, fontFamily: "sans-serif" }}>
           No history yet — generate your first piece of content to see it here.
         </div>
       </div>
@@ -851,11 +851,11 @@ function HistoryScreen({ history, onBack, onRestore }) {
                 <span style={{ fontSize: 16 }}>{fmtIcon[item.format] || "✦"}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", fontFamily: "sans-serif", marginBottom: 3 }}>{item.topic}</div>
-                  <div style={{ fontSize: 10, color: B.midGray, fontFamily: "sans-serif", letterSpacing: "0.05em" }}>
+                  <div style={{ fontSize: 10, color: "#888888", fontFamily: "sans-serif", letterSpacing: "0.05em" }}>
                     {pillarObj?.icon} {pillarObj?.label} · {item.format} · {fmt(item.timestamp)}
                   </div>
                 </div>
-                <span style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif" }}>{isOpen ? "▲" : "▼"}</span>
+                <span style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif" }}>{isOpen ? "▲" : "▼"}</span>
               </button>
               {isOpen && (
                 <div style={{ borderTop: `1px solid ${B.border}`, padding: "16px" }}>
@@ -983,17 +983,17 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
           <div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
               <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
-                Content Creator
+                The Content Ready Agent
               </h1>
-              <span style={{ fontSize: 9, color: B.gold, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>by RESH</span>
+              <span style={{ fontSize: 9, color: "#0891B2", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>by RESH</span>
             </div>
-            <p style={{ fontSize: 11, color: B.midGray, margin: "2px 0 0" }}>
-              Writing as <span style={{ color: B.goldLight, fontWeight: 600 }}>{profile.name}</span> · {profile.market}
+            <p style={{ fontSize: 11, color: "#888888", margin: "2px 0 0" }}>
+              Writing as <span style={{ color: "#0891B2", fontWeight: 600 }}>{profile.name}</span> · {profile.market}
             </p>
           </div>
           <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
             <button onClick={onViewHistory} style={navBtnStyle}>
-              History{history.length > 0 && <span style={{ color: B.gold, marginLeft: 3 }}>({history.length})</span>}
+              History{history.length > 0 && <span style={{ color: "#2D2D2D", marginLeft: 3 }}>({history.length})</span>}
             </button>
             <button onClick={onEditProfile} style={navBtnStyle}>Profile</button>
           </div>
@@ -1029,7 +1029,7 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
                 <span style={{ fontSize: 17, lineHeight: 1.2 }}>{f.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: format === f.id ? B.gold : B.white, marginBottom: 2, fontFamily: "sans-serif" }}>{f.label}</div>
-                  <div style={{ fontSize: 11, color: B.midGray, fontFamily: "sans-serif", lineHeight: 1.4 }}>{f.desc}</div>
+                  <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", lineHeight: 1.4 }}>{f.desc}</div>
                 </div>
               </button>
             ))}
@@ -1066,7 +1066,7 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
               whiteSpace: "nowrap", transition: "all 0.2s",
             }}>{loading ? "WRITING…" : "GENERATE ✦"}</button>
           </div>
-          <p style={{ fontSize: 11, color: B.midGray, margin: "6px 0 0" }}>
+          <p style={{ fontSize: 11, color: "#888888", margin: "6px 0 0" }}>
             <span style={{ color: B.gold }}>{selPillar?.icon} {selPillar?.label}</span>
             {" · "}
             <span style={{ color: B.lightGray }}>{selFmt?.icon} {selFmt?.label}</span>
@@ -1084,7 +1084,7 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
         {loading && (
           <div style={{ padding: "32px", textAlign: "center", background: B.card, borderRadius: 12, border: `1px solid ${B.border}` }}>
             <div style={{ fontSize: 22, marginBottom: 10, display: "inline-block", animation: "spin 3s linear infinite", color: "#1A1A1A" }}>✦</div>
-            <div style={{ fontSize: 13, color: B.midGray, fontFamily: "sans-serif" }}>
+            <div style={{ fontSize: 13, color: "#888888", fontFamily: "sans-serif" }}>
               Writing your {selFmt?.label} as {profile.name}…
             </div>
           </div>
@@ -1100,7 +1100,7 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, paddingBottom: 14, borderBottom: `1px solid ${B.border}` }}>
               <div style={{ width: 3, height: 20, background: B.gold, borderRadius: 2, flexShrink: 0 }} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: B.gold, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "sans-serif" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#2D2D2D", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "sans-serif" }}>
                 {selFmt?.label} — "{topic}"
               </span>
             </div>
@@ -1163,7 +1163,7 @@ export default function App() {
   if (screen === "loading") {
     return (
       <div style={{ minHeight: "100vh", background: B.pageBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontSize: 13, color: B.midGray, fontFamily: "sans-serif", letterSpacing: "0.1em" }}>LOADING…</div>
+        <div style={{ fontSize: 13, color: "#888888", fontFamily: "sans-serif", letterSpacing: "0.1em" }}>LOADING…</div>
       </div>
     );
   }
