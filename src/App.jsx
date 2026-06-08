@@ -121,7 +121,7 @@ Reference their specific market, neighborhoods, and price ranges where relevant.
       "anthropic-dangerous-direct-browser-access": "true",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1000,
       system: systemPrompt,
       messages: [{ role: "user", content: `Topic: ${topic}` }],
