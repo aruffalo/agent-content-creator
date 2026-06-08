@@ -129,7 +129,7 @@ Reference their specific market, neighborhoods, and price ranges where relevant.
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
-      max_tokens: 1000,
+      max_tokens: 1500,
       system: systemPrompt,
       messages: [{ role: "user", content: `Topic: ${topic}` }],
     }),
@@ -140,12 +140,31 @@ Reference their specific market, neighborhoods, and price ranges where relevant.
     throw new Error(err?.error?.message || `API error ${response.status}`);
   }
 
-  const data  = await response.json();
-  const text  = data.content?.[0]?.text || "";
-  const first = text.indexOf("{");
-  const last  = text.lastIndexOf("}");
-  if (first === -1 || last === -1) throw new Error("No JSON found in response");
-  return JSON.parse(text.slice(first, last + 1));
+  const data = await response.json();
+
+  // Collect all text blocks
+  const text = (data.content || [])
+    .filter(b => b.type === "text")
+    .map(b => b.text || "")
+    .join("");
+
+  if (!text) throw new Error("Empty response — please try again.");
+
+  // Strip markdown fences if present
+  const cleaned = text
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim();
+
+  const first = cleaned.indexOf("{");
+  const last  = cleaned.lastIndexOf("}");
+  if (first === -1 || last === -1) throw new Error("Could not parse content — please try again.");
+
+  try {
+    return JSON.parse(cleaned.slice(first, last + 1));
+  } catch {
+    throw new Error("Content formatting error — please try again.");
+  }
 }
 
 // ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
