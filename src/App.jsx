@@ -590,36 +590,54 @@ function StaticResult({ data, profile }) {
       <div>
         <GoldLabel>👁️ Post Preview</GoldLabel>
         <div style={{
-          aspectRatio: "1/1", maxHeight: 280,
-          background: "#1A1A1A",
-          border: `1px solid ${B.border}`,
+          aspectRatio: "1/1", maxHeight: 320,
+          background: "#FFFFFF",
+          border: "1px solid rgba(0,0,0,0.08)",
           borderRadius: 12,
+          boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
           display: "flex", flexDirection: "column",
-          justifyContent: "center", alignItems: "center",
-          padding: 32, position: "relative", overflow: "hidden",
+          position: "relative", overflow: "hidden",
         }}>
-          <div style={{ position: "absolute", top: 0, left: 0, width: 3, height: 80, background: B.gold }} />
-          <div style={{ position: "absolute", top: 0, left: 0, width: 80, height: 3, background: B.gold }} />
-          <div style={{ position: "absolute", bottom: 0, right: 0, width: 3, height: 80, background: `${B.gold}44` }} />
-          <div style={{ position: "absolute", bottom: 0, right: 0, width: 80, height: 3, background: `${B.gold}44` }} />
-          {(data.onscreen || []).map((line, i) => (
-            <div key={i} style={{
-              fontSize: i === 0 ? 18 : 13,
-              fontWeight: i === 0 ? 700 : 400,
-              color: i === 0 ? B.white : B.warmGray,
-              fontFamily: i === 0 ? "Georgia, serif" : "sans-serif",
-              fontStyle: i === 0 ? "italic" : "normal",
-              textAlign: "center", marginBottom: 10, lineHeight: 1.3,
-            }}>{line}</div>
-          ))}
-          {data.subtext && (
-            <div style={{ fontSize: 11, color: "#888888", textAlign: "center", fontFamily: "sans-serif", marginTop: 4 }}>{data.subtext}</div>
-          )}
-          <div style={{ position: "absolute", bottom: 14, left: 0, right: 0, display: "flex", justifyContent: "space-between", padding: "0 18px" }}>
-            <span style={{ fontSize: 9, color: "#2D2D2D", letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "sans-serif", fontWeight: 700 }}>
+          {/* Accent corner */}
+          <div style={{ position: "absolute", top: 0, left: 0, width: 4, height: "100%", background: "#1A1A1A" }} />
+
+          {/* Main content area */}
+          <div style={{
+            flex: 1, display: "flex", flexDirection: "column",
+            justifyContent: "center", alignItems: "center",
+            padding: "28px 32px 16px", gap: 12, textAlign: "center",
+          }}>
+            {(data.onscreen || []).map((line, i) => (
+              <div key={i} style={{
+                fontSize: i === 0 ? 22 : 14,
+                fontWeight: i === 0 ? 800 : 500,
+                color: i === 0 ? "#1A1A1A" : "#4B5563",
+                fontFamily: i === 0 ? "Georgia, serif" : "sans-serif",
+                fontStyle: i === 0 ? "italic" : "normal",
+                lineHeight: 1.3,
+                maxWidth: "90%",
+              }}>{line}</div>
+            ))}
+            {data.subtext && (
+              <div style={{
+                fontSize: 11, color: "#9CA3AF", fontFamily: "sans-serif",
+                marginTop: 2, paddingTop: 10, borderTop: "1px solid rgba(0,0,0,0.06)",
+                width: "60%",
+              }}>{data.subtext}</div>
+            )}
+          </div>
+
+          {/* Footer bar */}
+          <div style={{
+            borderTop: "1px solid rgba(0,0,0,0.06)",
+            background: "#F8F9FA",
+            padding: "10px 18px",
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+          }}>
+            <span style={{ fontSize: 10, color: "#1A1A1A", letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "sans-serif", fontWeight: 800 }}>
               {profile?.name || "YOUR NAME"}
             </span>
-            <span style={{ fontSize: 9, color: "#888888", fontFamily: "sans-serif" }}>{profile?.market || ""}</span>
+            <span style={{ fontSize: 10, color: "#9CA3AF", fontFamily: "sans-serif" }}>{profile?.market || ""}</span>
           </div>
         </div>
       </div>
@@ -651,31 +669,47 @@ function PinterestResult({ data, profile }) {
       <div>
         <GoldLabel>👁️ Pin Preview</GoldLabel>
         <div style={{
-          aspectRatio: "2/3", maxHeight: 340,
-          background: "#1A1A1A",
-          border: `1px solid ${B.border}`,
+          aspectRatio: "2/3", maxHeight: 380,
+          background: "#FFFFFF",
+          border: "1px solid rgba(0,0,0,0.08)",
           borderRadius: 12,
+          boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
           display: "flex", flexDirection: "column",
-          justifyContent: "center", alignItems: "center",
-          padding: 32, position: "relative", overflow: "hidden",
+          position: "relative", overflow: "hidden",
         }}>
-          <div style={{ position: "absolute", top: 0, left: 0, width: 3, height: 80, background: "#0891B2" }} />
-          <div style={{ position: "absolute", top: 0, left: 0, width: 80, height: 3, background: "#0891B2" }} />
-          {(data.onscreen || []).map((line, i) => (
-            <div key={i} style={{
-              fontSize: i === 0 ? 19 : 14,
-              fontWeight: i === 0 ? 700 : 400,
-              color: i === 0 ? B.white : B.warmGray,
-              fontFamily: i === 0 ? "Georgia, serif" : "sans-serif",
-              fontStyle: i === 0 ? "italic" : "normal",
-              textAlign: "center", marginBottom: 12, lineHeight: 1.3,
-            }}>{line}</div>
-          ))}
-          <div style={{ position: "absolute", bottom: 14, left: 0, right: 0, display: "flex", justifyContent: "space-between", padding: "0 18px" }}>
-            <span style={{ fontSize: 9, color: "#0891B2", letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "sans-serif", fontWeight: 700 }}>
+          {/* Accent corner */}
+          <div style={{ position: "absolute", top: 0, left: 0, width: 4, height: "100%", background: "#0891B2" }} />
+
+          {/* Main content area */}
+          <div style={{
+            flex: 1, display: "flex", flexDirection: "column",
+            justifyContent: "center", alignItems: "center",
+            padding: "32px 28px", gap: 14, textAlign: "center",
+          }}>
+            {(data.onscreen || []).map((line, i) => (
+              <div key={i} style={{
+                fontSize: i === 0 ? 23 : 14,
+                fontWeight: i === 0 ? 800 : 500,
+                color: i === 0 ? "#1A1A1A" : "#4B5563",
+                fontFamily: i === 0 ? "Georgia, serif" : "sans-serif",
+                fontStyle: i === 0 ? "italic" : "normal",
+                lineHeight: 1.3,
+                maxWidth: "90%",
+              }}>{line}</div>
+            ))}
+          </div>
+
+          {/* Footer bar */}
+          <div style={{
+            borderTop: "1px solid rgba(0,0,0,0.06)",
+            background: "#F0F9FB",
+            padding: "10px 18px",
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+          }}>
+            <span style={{ fontSize: 10, color: "#0891B2", letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "sans-serif", fontWeight: 800 }}>
               {profile?.name || "YOUR NAME"}
             </span>
-            <span style={{ fontSize: 9, color: "#888888", fontFamily: "sans-serif" }}>{profile?.market || ""}</span>
+            <span style={{ fontSize: 10, color: "#9CA3AF", fontFamily: "sans-serif" }}>{profile?.market || ""}</span>
           </div>
         </div>
       </div>
