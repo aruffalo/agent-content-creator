@@ -280,17 +280,10 @@ const CANVA_FONTS = {
 };
 
 const CANVA_URLS = {
-  reel:      "https://www.canva.com/design/DANew/new?type=MobileVideo&ratio=9:16",
-  carousel:  "https://www.canva.com/design/DANew/new?type=Presentation",
-  static:    "https://www.canva.com/design/DANew/new?type=SocialMedia",
-  pinterest: "https://www.canva.com/design/DANew/new?type=Pin",
-};
-
-const CANVA_SEARCHES = {
-  reel:      "real estate reel 9x16",
-  carousel:  "real estate carousel instagram",
-  static:    "real estate instagram post",
-  pinterest: "real estate pinterest pin",
+  reel:      "https://www.canva.com/instagram-reels/templates/",
+  carousel:  "https://www.canva.com/instagram-posts/templates/",
+  static:    "https://www.canva.com/instagram-posts/templates/",
+  pinterest: "https://www.canva.com/pinterest-pins/templates/",
 };
 
 function CanvaSection({ format, data, profile }) {
@@ -379,10 +372,9 @@ function CanvaSection({ format, data, profile }) {
                 textDecoration: "none", fontFamily: "sans-serif",
                 letterSpacing: "0.06em", display: "block",
               }}>
-                {format === "reel" ? "📱 Open 1080×1920 Blank" : format === "pinterest" ? "📌 Open 1000×1500 Pin" : "🖼️ Open 1080×1080 Blank"}
+                {format === "reel" ? "📱 Browse Reel Templates (1080×1920)" : format === "pinterest" ? "📌 Browse Pin Templates (1000×1500)" : "🖼️ Browse Post Templates (1080×1080)"}
               </a>
-              <a href={`https://www.canva.com/search/templates?q=${encodeURIComponent(CANVA_SEARCHES[format])}`}
-                target="_blank" rel="noopener noreferrer" style={{
+              <a href="https://www.canva.com/" target="_blank" rel="noopener noreferrer" style={{
                   flex: 1, padding: "10px 14px", borderRadius: 8, textAlign: "center",
                   background: "transparent",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -390,9 +382,12 @@ function CanvaSection({ format, data, profile }) {
                   textDecoration: "none", fontFamily: "sans-serif",
                   letterSpacing: "0.06em", display: "block",
                 }}>
-                🔍 Browse Templates
+                🎨 Open Canva
               </a>
             </div>
+            <p style={{ fontSize: 10, color: "#9CA3AF", margin: "6px 0 0", fontFamily: "sans-serif", lineHeight: 1.5 }}>
+              On the template page, pick any design close to the right size — you can always adjust dimensions in Canva's editor.
+            </p>
           </div>
 
           {/* Step 2 — Copy All Text */}
