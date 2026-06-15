@@ -48,32 +48,16 @@ function saveHistory(history) {
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch {}
 }
 
-// ─── BETA ACCESS GATE ─────────────────────────────────────────────────────────
-// Set VITE_BETA_ACCESS_CODE in Vercel to require a code to use the app.
-// Leave it blank/unset to open the app to everyone (no gate shown).
-// Change the value (and redeploy) at any time to instantly lock out everyone
-// who was using the old code.
-const ACCESS_CODE_KEY = "resh_beta_access_code";
-
-function getRequiredAccessCode() {
-  return (import.meta.env.VITE_BETA_ACCESS_CODE || "").trim();
-}
-
-function checkAccess() {
-  const required = getRequiredAccessCode();
-  if (!required) return true; // no code configured — gate is off
-  try {
-    return localStorage.getItem(ACCESS_CODE_KEY) === required;
-  } catch {
-    return false;
-  }
-}
-
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const FORMAT_OPTIONS = [
   { id: "reel",     label: "Reel",     icon: "🎬", desc: "Hook · B-roll · Voiceover · Caption" },
   { id: "carousel", label: "Carousel", icon: "🖼️", desc: "5–7 slides with hooks, copy & CTA" },
   { id: "static",   label: "Static",   icon: "✦",  desc: "Single-image overlay — screenshot & post" },
+];
+
+const CONTENT_TYPES = [
+  { id: "social",    label: "Social Post",  icon: "📱", desc: "Reel, Carousel, or Static for Instagram" },
+  { id: "pinterest", label: "Pinterest Pin", icon: "📌", desc: "Evergreen, search-optimized pin" },
 ];
 
 const PILLAR_OPTIONS = [
@@ -110,6 +94,11 @@ async function generateContent({ topic, format, pillar, profile }) {
 - onscreen (array of 2-3 strings): text overlay lines for the graphic
 - subtext (string): 1 short supporting line in smaller text
 - caption (string): Instagram caption 50-80 words with CTA`,
+    pinterest: `Return a JSON object with:
+- pin_title (string): search-optimized pin title under 100 characters, front-load keywords (location, topic, buyer/seller intent)
+- onscreen (array of 2-3 strings): text overlay lines for a tall vertical pin graphic (1000x1500)
+- description (string): 150-300 character pin description packed with searchable keywords — neighborhood names, city, price ranges, buyer/seller search phrases. Written naturally, not keyword-stuffed.
+- board_suggestion (string): a Pinterest board name this pin would fit on, e.g. "[City] Neighborhood Guides" or "First-Time Buyer Tips"`,
   };
 
   const voiceDesc       = profile.voiceTags?.length   ? `Voice descriptors: ${profile.voiceTags.join(", ")}.` : "";
@@ -135,7 +124,7 @@ ${formatInstructions[format]}
 
 CRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Pure JSON object only.
 Write all content as if the agent is speaking directly — use "I", "my", "we" naturally.
-Reference their specific market, neighborhoods, and price ranges where relevant.`;
+Reference their specific market, neighborhoods, and price ranges where relevant.${format === "pinterest" ? "\nThis content is for Pinterest — write for evergreen, search-driven discovery rather than a timely social feed. Prioritize clear, descriptive, keyword-natural language over punchy social hooks." : ""}`;
 
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("Missing API key — check your Vercel environment variables.");
@@ -291,15 +280,17 @@ const CANVA_FONTS = {
 };
 
 const CANVA_URLS = {
-  reel:     "https://www.canva.com/design/DANew/new?type=MobileVideo&ratio=9:16",
-  carousel: "https://www.canva.com/design/DANew/new?type=Presentation",
-  static:   "https://www.canva.com/design/DANew/new?type=SocialMedia",
+  reel:      "https://www.canva.com/design/DANew/new?type=MobileVideo&ratio=9:16",
+  carousel:  "https://www.canva.com/design/DANew/new?type=Presentation",
+  static:    "https://www.canva.com/design/DANew/new?type=SocialMedia",
+  pinterest: "https://www.canva.com/design/DANew/new?type=Pin",
 };
 
 const CANVA_SEARCHES = {
-  reel:     "real estate reel 9x16",
-  carousel: "real estate carousel instagram",
-  static:   "real estate instagram post",
+  reel:      "real estate reel 9x16",
+  carousel:  "real estate carousel instagram",
+  static:    "real estate instagram post",
+  pinterest: "real estate pinterest pin",
 };
 
 function CanvaSection({ format, data, profile }) {
@@ -329,6 +320,13 @@ function CanvaSection({ format, data, profile }) {
       `SUPPORTING LINE:\n${data.onscreen?.[1] || ""}`,
       `SUBTEXT (small):\n${data.subtext || ""}`,
       `CAPTION:\n${data.caption}`,
+    ].join("\n\n");
+  } else if (format === "pinterest") {
+    copyText = [
+      `PIN TITLE:\n${data.pin_title || ""}`,
+      `ON-SCREEN TEXT:\n${(data.onscreen || []).map((l, i) => `${i + 1}. ${l}`).join("\n")}`,
+      `PIN DESCRIPTION:\n${data.description || ""}`,
+      `SUGGESTED BOARD:\n${data.board_suggestion || ""}`,
     ].join("\n\n");
   }
 
@@ -381,7 +379,7 @@ function CanvaSection({ format, data, profile }) {
                 textDecoration: "none", fontFamily: "sans-serif",
                 letterSpacing: "0.06em", display: "block",
               }}>
-                {format === "reel" ? "📱 Open 1080×1920 Blank" : "🖼️ Open 1080×1080 Blank"}
+                {format === "reel" ? "📱 Open 1080×1920 Blank" : format === "pinterest" ? "📌 Open 1000×1500 Pin" : "🖼️ Open 1080×1080 Blank"}
               </a>
               <a href={`https://www.canva.com/search/templates?q=${encodeURIComponent(CANVA_SEARCHES[format])}`}
                 target="_blank" rel="noopener noreferrer" style={{
@@ -453,6 +451,11 @@ function CanvaSection({ format, data, profile }) {
                 "Keep each slide to ONE headline + 2-3 lines max — white space is your friend",
                 "Use the same background color or texture across all slides for brand consistency",
                 "End card (CTA slide) should have your headshot + contact info",
+              ] : format === "pinterest" ? [
+                "Use a tall vertical layout (2:3 ratio) — Pinterest favors this aspect ratio in feeds",
+                "Put your boldest text in the top half — that's what shows in grid view before someone clicks",
+                "Add your logo or name small in a bottom corner — pins get saved and re-shared widely",
+                "Use bright, high-contrast colors — Pinterest is a visually competitive, scroll-heavy feed",
               ] : [
                 "Your headline should be the largest element — at least 50% of the visual weight",
                 "Add your headshot in a corner circle for brand recognition",
@@ -460,7 +463,7 @@ function CanvaSection({ format, data, profile }) {
                 "Include your handle and market name in small text at the bottom",
               ]).map((tip, i) => (
                 <div key={i} style={{ display: "flex", gap: 9 }}>
-                  <span style={{ color: "#00C4CC", fontSize: 11, flexShrink: 0, paddingTop: 2, fontFamily: "sans-serif" }}>✦</span>
+                  <span style={{ color: "#0891B2", fontSize: 11, flexShrink: 0, paddingTop: 2, fontFamily: "sans-serif" }}>✦</span>
                   <span style={{ fontSize: 11, color: "#888888", lineHeight: 1.6, fontFamily: "sans-serif" }}>{tip}</span>
                 </div>
               ))}
@@ -628,6 +631,66 @@ function StaticResult({ data, profile }) {
         <Block>{data.caption}</Block>
       </div>
       <CanvaSection format="static" data={data} profile={profile} />
+    </div>
+  );
+}
+
+function PinterestResult({ data, profile }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div>
+        <GoldLabel>📌 Pin Title</GoldLabel>
+        <div style={{
+          background: "#F4F5F7", border: "1px solid rgba(0,0,0,0.1)",
+          borderRadius: 10, padding: "14px 18px",
+          fontSize: 17, fontWeight: 700,
+          fontFamily: "Georgia, serif", fontStyle: "italic",
+          color: "#1A1A1A", lineHeight: 1.35,
+        }}>{data.pin_title}</div>
+      </div>
+      <div>
+        <GoldLabel>👁️ Pin Preview</GoldLabel>
+        <div style={{
+          aspectRatio: "2/3", maxHeight: 340,
+          background: "#1A1A1A",
+          border: `1px solid ${B.border}`,
+          borderRadius: 12,
+          display: "flex", flexDirection: "column",
+          justifyContent: "center", alignItems: "center",
+          padding: 32, position: "relative", overflow: "hidden",
+        }}>
+          <div style={{ position: "absolute", top: 0, left: 0, width: 3, height: 80, background: "#0891B2" }} />
+          <div style={{ position: "absolute", top: 0, left: 0, width: 80, height: 3, background: "#0891B2" }} />
+          {(data.onscreen || []).map((line, i) => (
+            <div key={i} style={{
+              fontSize: i === 0 ? 19 : 14,
+              fontWeight: i === 0 ? 700 : 400,
+              color: i === 0 ? B.white : B.warmGray,
+              fontFamily: i === 0 ? "Georgia, serif" : "sans-serif",
+              fontStyle: i === 0 ? "italic" : "normal",
+              textAlign: "center", marginBottom: 12, lineHeight: 1.3,
+            }}>{line}</div>
+          ))}
+          <div style={{ position: "absolute", bottom: 14, left: 0, right: 0, display: "flex", justifyContent: "space-between", padding: "0 18px" }}>
+            <span style={{ fontSize: 9, color: "#0891B2", letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "sans-serif", fontWeight: 700 }}>
+              {profile?.name || "YOUR NAME"}
+            </span>
+            <span style={{ fontSize: 9, color: "#888888", fontFamily: "sans-serif" }}>{profile?.market || ""}</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <GoldLabel style={{ marginBottom: 0 }}>📝 Pin Description</GoldLabel>
+          <CopyBtn text={data.description} />
+        </div>
+        <Block>{data.description}</Block>
+      </div>
+      <div>
+        <GoldLabel>🗂️ Suggested Board</GoldLabel>
+        <Block style={{ borderLeft: "3px solid #0891B2", fontWeight: 600 }}>{data.board_suggestion}</Block>
+      </div>
+      <CanvaSection format="pinterest" data={data} profile={profile} />
     </div>
   );
 }
@@ -836,7 +899,7 @@ function OnboardingScreen({ onComplete, existing }) {
 // ─── HISTORY SCREEN ───────────────────────────────────────────────────────────
 function HistoryScreen({ history, onBack, onRestore }) {
   const [expanded, setExpanded] = useState(null);
-  const fmtIcon = { reel: "🎬", carousel: "🖼️", static: "✦" };
+  const fmtIcon = { reel: "🎬", carousel: "🖼️", static: "✦", pinterest: "📌" };
   const fmt = (ts) => new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   if (history.length === 0) {
@@ -881,9 +944,10 @@ function HistoryScreen({ history, onBack, onRestore }) {
               {isOpen && (
                 <div style={{ borderTop: `1px solid ${B.border}`, padding: "16px" }}>
                   <div style={{ marginBottom: 14 }}>
-                    {item.format === "reel"     && <ReelResult     data={item.result} profile={item.profile} />}
-                    {item.format === "carousel" && <CarouselResult data={item.result} />}
-                    {item.format === "static"   && <StaticResult   data={item.result} profile={item.profile} />}
+                    {item.format === "reel"      && <ReelResult     data={item.result} profile={item.profile} />}
+                    {item.format === "carousel"  && <CarouselResult data={item.result} />}
+                    {item.format === "static"    && <StaticResult   data={item.result} profile={item.profile} />}
+                    {item.format === "pinterest" && <PinterestResult data={item.result} profile={item.profile} />}
                   </div>
                   <button onClick={() => onRestore(item)} style={{
                     width: "100%", padding: "10px",
@@ -942,6 +1006,7 @@ function DuplicateWarning({ matches, onContinue, onViewOriginal }) {
 // ─── GENERATOR SCREEN ─────────────────────────────────────────────────────────
 function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHistory }) {
   const [topic,           setTopic]           = useState("");
+  const [contentType,     setContentType]     = useState("social");
   const [format,          setFormat]          = useState("reel");
   const [pillar,          setPillar]          = useState("buyer");
   const [loading,         setLoading]         = useState(false);
@@ -950,8 +1015,17 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
   const [dupes,           setDupes]           = useState(null);
   const [pendingGenerate, setPendingGenerate] = useState(false);
 
-  const selFmt    = FORMAT_OPTIONS.find(f => f.id === format);
+  const selFmt    = contentType === "pinterest"
+    ? { id: "pinterest", label: "Pinterest Pin", icon: "📌" }
+    : FORMAT_OPTIONS.find(f => f.id === format);
   const selPillar = PILLAR_OPTIONS.find(p => p.id === pillar);
+
+  function handleContentTypeChange(type) {
+    setContentType(type);
+    setFormat(type === "pinterest" ? "pinterest" : "reel");
+    setResult(null);
+    setError("");
+  }
 
   function findDuplicates(topic) {
     const words = topic.toLowerCase().split(/\s+/).filter(w => w.length > 3);
@@ -1035,27 +1109,66 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
           </div>
         </div>
 
-        {/* Format */}
+        {/* Content Type Toggle */}
         <div>
-          <GoldLabel>Format</GoldLabel>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {FORMAT_OPTIONS.map(f => (
-              <button key={f.id} onClick={() => setFormat(f.id)} style={{
-                display: "flex", alignItems: "flex-start", gap: 12,
+          <GoldLabel>What Are You Creating?</GoldLabel>
+          <div style={{ display: "flex", gap: 6 }}>
+            {CONTENT_TYPES.map(c => (
+              <button key={c.id} onClick={() => handleContentTypeChange(c.id)} style={{
+                flex: 1, display: "flex", alignItems: "flex-start", gap: 10,
                 padding: "11px 14px", borderRadius: 10, textAlign: "left",
-                border: `1px solid ${format === f.id ? "#1A1A1A" : "rgba(0,0,0,0.08)"}`,
-                background: format === f.id ? "rgba(26,26,26,0.06)" : "#FFFFFF",
+                border: `1px solid ${contentType === c.id ? "#1A1A1A" : "rgba(0,0,0,0.08)"}`,
+                background: contentType === c.id ? "rgba(26,26,26,0.06)" : "#FFFFFF",
                 cursor: "pointer", transition: "all 0.15s",
               }}>
-                <span style={{ fontSize: 17, lineHeight: 1.2 }}>{f.icon}</span>
+                <span style={{ fontSize: 17, lineHeight: 1.2 }}>{c.icon}</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: format === f.id ? B.gold : B.white, marginBottom: 2, fontFamily: "sans-serif" }}>{f.label}</div>
-                  <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", lineHeight: 1.4 }}>{f.desc}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A1A", marginBottom: 2, fontFamily: "sans-serif" }}>{c.label}</div>
+                  <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", lineHeight: 1.4 }}>{c.desc}</div>
                 </div>
               </button>
             ))}
           </div>
         </div>
+
+        {/* Format — only shown for Social Posts */}
+        {contentType === "social" && (
+          <div>
+            <GoldLabel>Format</GoldLabel>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {FORMAT_OPTIONS.map(f => (
+                <button key={f.id} onClick={() => setFormat(f.id)} style={{
+                  display: "flex", alignItems: "flex-start", gap: 12,
+                  padding: "11px 14px", borderRadius: 10, textAlign: "left",
+                  border: `1px solid ${format === f.id ? "#1A1A1A" : "rgba(0,0,0,0.08)"}`,
+                  background: format === f.id ? "rgba(26,26,26,0.06)" : "#FFFFFF",
+                  cursor: "pointer", transition: "all 0.15s",
+                }}>
+                  <span style={{ fontSize: 17, lineHeight: 1.2 }}>{f.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: format === f.id ? B.gold : B.white, marginBottom: 2, fontFamily: "sans-serif" }}>{f.label}</div>
+                    <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", lineHeight: 1.4 }}>{f.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Pinterest info note */}
+        {contentType === "pinterest" && (
+          <div style={{
+            background: "rgba(8,145,178,0.05)", border: "1px solid rgba(8,145,178,0.2)",
+            borderRadius: 10, padding: "12px 14px",
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#0891B2", fontFamily: "sans-serif", marginBottom: 3 }}>
+              📌 Pinterest Pin
+            </div>
+            <div style={{ fontSize: 11, color: "#888888", fontFamily: "sans-serif", lineHeight: 1.6 }}>
+              You'll get a search-optimized pin title, vertical text overlay, keyword-rich description, and a board suggestion — built for long-term, evergreen discovery.
+            </div>
+          </div>
+        )}
 
         {/* Topic */}
         <div>
@@ -1125,9 +1238,10 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
                 {selFmt?.label} — "{topic}"
               </span>
             </div>
-            {format === "reel"     && <ReelResult     data={result} profile={profile} />}
-            {format === "carousel" && <CarouselResult data={result} />}
-            {format === "static"   && <StaticResult   data={result} profile={profile} />}
+            {format === "reel"      && <ReelResult     data={result} profile={profile} />}
+            {format === "carousel"  && <CarouselResult data={result} />}
+            {format === "static"    && <StaticResult   data={result} profile={profile} />}
+            {format === "pinterest" && <PinterestResult data={result} profile={profile} />}
             <button onClick={() => doGenerate("generate a completely different angle or approach")} style={{
               marginTop: 18, width: "100%", padding: "11px",
               background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.1)",
@@ -1160,67 +1274,11 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
   );
 }
 
-// ─── ACCESS GATE SCREEN ───────────────────────────────────────────────────────
-function AccessGate({ onUnlock }) {
-  const [code, setCode] = useState("");
-  const [error, setError] = useState(false);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    const required = getRequiredAccessCode();
-    if (code.trim() && code.trim() === required) {
-      try { localStorage.setItem(ACCESS_CODE_KEY, code.trim()); } catch {}
-      setError(false);
-      onUnlock();
-    } else {
-      setError(true);
-    }
-  }
-
-  return (
-    <div style={{ minHeight: "100vh", background: B.pageBg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", padding: 22 }}>
-      <div style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 14, padding: "32px 26px", maxWidth: 360, width: "100%", textAlign: "center", boxSizing: "border-box" }}>
-        <div style={{ fontSize: 24, marginBottom: 8 }}>🔒</div>
-        <h2 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 6px", fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
-          Private Beta
-        </h2>
-        <p style={{ fontSize: 12, color: "#888888", margin: "0 0 18px", lineHeight: 1.5 }}>
-          The Content Ready Agent is currently invite-only. Enter your access code to continue.
-        </p>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            value={code}
-            onChange={e => { setCode(e.target.value); setError(false); }}
-            placeholder="Access code"
-            autoFocus
-            style={{ ...inputStyle, textAlign: "center", marginBottom: 12 }}
-          />
-          {error && (
-            <p style={{ fontSize: 11, color: B.redText, margin: "0 0 12px" }}>
-              That code didn't work — double-check and try again.
-            </p>
-          )}
-          <button type="submit" style={{
-            width: "100%", padding: "13px", borderRadius: 10,
-            background: "#1A1A1A", color: "#FFFFFF", border: "none",
-            fontSize: 12, fontWeight: 800, cursor: "pointer",
-            letterSpacing: "0.1em", fontFamily: "sans-serif",
-          }}>
-            ENTER ✦
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen,  setScreen]  = useState("loading");
   const [profile, setProfile] = useState(null);
   const [history, setHistory] = useState([]);
-  const [unlocked, setUnlocked] = useState(checkAccess);
 
   useEffect(() => {
     const p = loadProfile();
@@ -1229,10 +1287,6 @@ export default function App() {
     setHistory(h);
     setScreen(p ? "generator" : "onboarding");
   }, []);
-
-  if (!unlocked) {
-    return <AccessGate onUnlock={() => setUnlocked(true)} />;
-  }
 
   function handleProfileSave(newProfile) {
     if (!newProfile) { setScreen("generator"); return; }
