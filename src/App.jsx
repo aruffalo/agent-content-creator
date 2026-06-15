@@ -48,6 +48,27 @@ function saveHistory(history) {
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch {}
 }
 
+// ─── BETA ACCESS GATE ─────────────────────────────────────────────────────────
+// Set VITE_BETA_ACCESS_CODE in Vercel to require a code to use the app.
+// Leave it blank/unset to open the app to everyone (no gate shown).
+// Change the value (and redeploy) at any time to instantly lock out everyone
+// who was using the old code.
+const ACCESS_CODE_KEY = "resh_beta_access_code";
+
+function getRequiredAccessCode() {
+  return (import.meta.env.VITE_BETA_ACCESS_CODE || "").trim();
+}
+
+function checkAccess() {
+  const required = getRequiredAccessCode();
+  if (!required) return true; // no code configured — gate is off
+  try {
+    return localStorage.getItem(ACCESS_CODE_KEY) === required;
+  } catch {
+    return false;
+  }
+}
+
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const FORMAT_OPTIONS = [
   { id: "reel",     label: "Reel",     icon: "🎬", desc: "Hook · B-roll · Voiceover · Caption" },
@@ -1139,11 +1160,67 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
   );
 }
 
+// ─── ACCESS GATE SCREEN ───────────────────────────────────────────────────────
+function AccessGate({ onUnlock }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const required = getRequiredAccessCode();
+    if (code.trim() && code.trim() === required) {
+      try { localStorage.setItem(ACCESS_CODE_KEY, code.trim()); } catch {}
+      setError(false);
+      onUnlock();
+    } else {
+      setError(true);
+    }
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: B.pageBg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", padding: 22 }}>
+      <div style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 14, padding: "32px 26px", maxWidth: 360, width: "100%", textAlign: "center", boxSizing: "border-box" }}>
+        <div style={{ fontSize: 24, marginBottom: 8 }}>🔒</div>
+        <h2 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 6px", fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
+          Private Beta
+        </h2>
+        <p style={{ fontSize: 12, color: "#888888", margin: "0 0 18px", lineHeight: 1.5 }}>
+          The Content Ready Agent is currently invite-only. Enter your access code to continue.
+        </p>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="password"
+            value={code}
+            onChange={e => { setCode(e.target.value); setError(false); }}
+            placeholder="Access code"
+            autoFocus
+            style={{ ...inputStyle, textAlign: "center", marginBottom: 12 }}
+          />
+          {error && (
+            <p style={{ fontSize: 11, color: B.redText, margin: "0 0 12px" }}>
+              That code didn't work — double-check and try again.
+            </p>
+          )}
+          <button type="submit" style={{
+            width: "100%", padding: "13px", borderRadius: 10,
+            background: "#1A1A1A", color: "#FFFFFF", border: "none",
+            fontSize: 12, fontWeight: 800, cursor: "pointer",
+            letterSpacing: "0.1em", fontFamily: "sans-serif",
+          }}>
+            ENTER ✦
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen,  setScreen]  = useState("loading");
   const [profile, setProfile] = useState(null);
   const [history, setHistory] = useState([]);
+  const [unlocked, setUnlocked] = useState(checkAccess);
 
   useEffect(() => {
     const p = loadProfile();
@@ -1152,6 +1229,10 @@ export default function App() {
     setHistory(h);
     setScreen(p ? "generator" : "onboarding");
   }, []);
+
+  if (!unlocked) {
+    return <AccessGate onUnlock={() => setUnlocked(true)} />;
+  }
 
   function handleProfileSave(newProfile) {
     if (!newProfile) { setScreen("generator"); return; }
