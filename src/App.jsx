@@ -49,7 +49,6 @@ function saveHistory(history) {
 }
 // ─── BETA ACCESS GATE ─────────────────────────────────────────────────────────
 // Set VITE_BETA_ACCESS_CODE in Vercel to require a code to use the app.
-// Leave it blank/unset to open the app to everyone (no gate shown).
 // Change the value (and redeploy) at any time to instantly lock out everyone
 // who was using the old code.
 const ACCESS_CODE_KEY = "resh_beta_access_code";
