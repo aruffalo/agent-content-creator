@@ -47,7 +47,26 @@ function loadHistory() {
 function saveHistory(history) {
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch {}
 }
+// ─── BETA ACCESS GATE ─────────────────────────────────────────────────────────
+// Set VITE_BETA_ACCESS_CODE in Vercel to require a code to use the app.
+// Leave it blank/unset to open the app to everyone (no gate shown).
+// Change the value (and redeploy) at any time to instantly lock out everyone
+// who was using the old code.
+const ACCESS_CODE_KEY = "resh_beta_access_code";
 
+function getRequiredAccessCode() {
+  return (import.meta.env.VITE_BETA_ACCESS_CODE || "").trim();
+}
+
+function checkAccess() {
+  const required = getRequiredAccessCode();
+  if (!required) return true; // no code configured — gate is off
+  try {
+    return localStorage.getItem(ACCESS_CODE_KEY) === required;
+  } catch {
+    return false;
+  }
+}
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const FORMAT_OPTIONS = [
   { id: "reel",     label: "Reel",     icon: "🎬", desc: "Hook · B-roll · Voiceover · Caption" },
