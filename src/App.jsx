@@ -144,7 +144,7 @@ CRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Pure J
 Write all content as if the agent is speaking directly — use "I", "my", "we" naturally.
 Reference their specific market, neighborhoods, and price ranges where relevant.${format === "pinterest" ? "\nThis content is for Pinterest — write for evergreen, search-driven discovery rather than a timely social feed. Prioritize clear, descriptive, keyword-natural language over punchy social hooks." : ""}`;
 
-  const apiKey = process.env.TCRA_2;;
+  const apiKey = process.env.TCRA_2;
   if (!apiKey) throw new Error("Missing API key — check your Vercel environment variables.");
 
  const response = await fetch("/api/generate", {
