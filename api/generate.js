@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.TCRA_2;;
+  const apiKey = process.env.a1b2c3999;
   if (!apiKey) {
     return res.status(500).json({ error: "Server configuration error — API key missing." });
   }
