@@ -85,8 +85,8 @@ function AccessGate({ onSuccess }) {
   return (
     <div style={{ minHeight: "100vh", background: "#0f0f0f", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
       <div style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 12, padding: "40px 32px", maxWidth: 380, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 13, letterSpacing: "0.15em", color: "#888", marginBottom: 8 }}>RUFFALO KNOWS REAL ESTATE</div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Content Ready Agent</div>
+        <div style={{ fontSize: 13, letterSpacing: "0.15em", color: "#888", marginBottom: 8 }}>REAL ESTATE SOLUTIONS HUB</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 8 }}>The Content Ready Agent</div>
         <div style={{ fontSize: 14, color: "#888", marginBottom: 28 }}>Beta Access</div>
         <input
           type="text"
