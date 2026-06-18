@@ -66,6 +66,49 @@ function checkAccess() {
     return false;
   }
 }
+function AccessGate({ onSuccess }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+
+  function handleSubmit() {
+    const required = getRequiredAccessCode();
+    const entered = code.trim();
+    if (entered === required) {
+      try { localStorage.setItem(ACCESS_CODE_KEY, entered); } catch {}
+      onSuccess();
+    } else {
+      setError(true);
+      setCode("");
+    }
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0f0f0f", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif" }}>
+      <div style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 12, padding: "40px 32px", maxWidth: 380, width: "100%", textAlign: "center" }}>
+        <div style={{ fontSize: 13, letterSpacing: "0.15em", color: "#888", marginBottom: 8 }}>RUFFALO KNOWS REAL ESTATE</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Content Ready Agent</div>
+        <div style={{ fontSize: 14, color: "#888", marginBottom: 28 }}>Beta Access</div>
+        <input
+          type="text"
+          placeholder="Enter access code"
+          value={code}
+          onChange={e => { setCode(e.target.value); setError(false); }}
+          onKeyDown={e => e.key === "Enter" && handleSubmit()}
+          style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: error ? "1px solid #e05c5c" : "1px solid #333", background: "#111", color: "#fff", fontSize: 15, marginBottom: 12, boxSizing: "border-box", outline: "none" }}
+        />
+        {error && <div style={{ color: "#e05c5c", fontSize: 13, marginBottom: 12 }}>Incorrect code — please try again.</div>}
+        <button
+          onClick={handleSubmit}
+          style={{ width: "100%", padding: "12px", borderRadius: 8, border: "none", background: "#c8a96e", color: "#000", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+        >
+          Enter
+        </button>
+        <div style={{ fontSize: 12, color: "#555", marginTop: 20 }}>Access code provided in your beta invitation.</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const FORMAT_OPTIONS = [
   { id: "reel",     label: "Reel",     icon: "🎬", desc: "Hook · B-roll · Voiceover · Caption" },
@@ -144,14 +187,18 @@ CRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Pure J
 Write all content as if the agent is speaking directly — use "I", "my", "we" naturally.
 Reference their specific market, neighborhoods, and price ranges where relevant.${format === "pinterest" ? "\nThis content is for Pinterest — write for evergreen, search-driven discovery rather than a timely social feed. Prioritize clear, descriptive, keyword-natural language over punchy social hooks." : ""}`;
 
-  const apiKey = process.env.TCRA_2;
-  if (!apiKey) throw new Error("Missing API key — check your Vercel environment variables.");
-
- const response = await fetch("/api/generate", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  const response = await fetch("/api/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1500,
+      system: systemPrompt,
+      messages: [{ role: "user", content: `Topic: ${topic}` }],
+    }),
+  });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
@@ -1319,17 +1366,16 @@ export default function App() {
   const [hasAccess, setHasAccess] = useState(checkAccess());
 
   useEffect(() => {
-    if (!hasAccess) {
-    return <AccessGate onSuccess={() => setHasAccess(true)} />;
-  }
-
-  useEffect(() => {
     const p = loadProfile();
     const h = loadHistory();
     setProfile(p);
     setHistory(h);
     setScreen(p ? "generator" : "onboarding");
   }, []);
+
+  if (!hasAccess) {
+    return <AccessGate onSuccess={() => setHasAccess(true)} />;
+  }
 
   function handleProfileSave(newProfile) {
     if (!newProfile) { setScreen("generator"); return; }
