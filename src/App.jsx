@@ -1316,6 +1316,12 @@ export default function App() {
   const [screen,  setScreen]  = useState("loading");
   const [profile, setProfile] = useState(null);
   const [history, setHistory] = useState([]);
+  const [hasAccess, setHasAccess] = useState(checkAccess());
+
+  useEffect(() => {
+    if (!hasAccess) {
+    return <AccessGate onSuccess={() => setHasAccess(true)} />;
+  }
 
   useEffect(() => {
     const p = loadProfile();
