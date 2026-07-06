@@ -33,6 +33,14 @@ const PROFILE_KEY = "resh_agent_profile";
 const HISTORY_KEY = "resh_content_history";
 const MAX_HISTORY = 100;
 
+// Used whenever no profile has been saved yet, so the generator
+// always has something safe to read from (no forced setup step).
+const DEFAULT_PROFILE = {
+  name: "", brokerage: "", market: "",
+  neighborhoods: "", niche: "",
+  voiceTags: [], sampleCaptions: "",
+};
+
 function loadProfile() {
   try { const v = localStorage.getItem(PROFILE_KEY); return v ? JSON.parse(v) : null; }
   catch { return null; }
@@ -805,7 +813,7 @@ function OnboardingScreen({ onComplete, existing }) {
         <p style={{ fontSize: 12, color: "#888888", margin: "4px 0 0", lineHeight: 1.5 }}>
           {existing
             ? "Update your details — all future content will reflect the changes."
-            : "Fill this out once and every piece of content will be written in your voice, for your market."}
+            : "Optional, but worth it — fill this out once and every piece of content will be written in your voice, for your market. You can skip this and generate content right away, then come back anytime."}
         </p>
       </div>
 
@@ -967,14 +975,12 @@ function OnboardingScreen({ onComplete, existing }) {
           {existing ? "SAVE CHANGES ✦" : "SAVE & START CREATING ✦"}
         </button>
 
-        {existing && (
-          <button onClick={() => onComplete(null)} style={{
-            padding: "10px", borderRadius: 10, background: "transparent",
-            border: "1px solid rgba(0,0,0,0.1)", color: "#888888",
-            fontSize: 11, fontWeight: 700, cursor: "pointer",
-            letterSpacing: "0.06em", fontFamily: "sans-serif",
-          }}>← CANCEL</button>
-        )}
+        <button onClick={() => onComplete(null)} style={{
+          padding: "10px", borderRadius: 10, background: "transparent",
+          border: "1px solid rgba(0,0,0,0.1)", color: "#888888",
+          fontSize: 11, fontWeight: 700, cursor: "pointer",
+          letterSpacing: "0.06em", fontFamily: "sans-serif",
+        }}>{existing ? "← CANCEL" : "SKIP FOR NOW — I'LL PERSONALIZE LATER"}</button>
       </div>
     </div>
   );
@@ -1167,7 +1173,9 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
               <span style={{ fontSize: 9, color: "#0891B2", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>by RESH</span>
             </div>
             <p style={{ fontSize: 11, color: "#888888", margin: "2px 0 0" }}>
-              Writing as <span style={{ color: "#0891B2", fontWeight: 600 }}>{profile.name}</span> · {profile.market}
+              {profile.name
+                ? <>Writing as <span style={{ color: "#0891B2", fontWeight: 600 }}>{profile.name}</span>{profile.market ? ` · ${profile.market}` : ""}</>
+                : <>Writing with a generic voice — <span onClick={onEditProfile} style={{ color: "#0891B2", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>add your details</span> to personalize</>}
             </p>
           </div>
           <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
@@ -1370,7 +1378,9 @@ export default function App() {
     const h = loadHistory();
     setProfile(p);
     setHistory(h);
-    setScreen(p ? "generator" : "onboarding");
+    // Profile setup is now optional — always land on the generator.
+    // Agents can personalize any time via the "Profile" button.
+    setScreen("generator");
   }, []);
 
   if (!hasAccess) {
@@ -1405,7 +1415,7 @@ export default function App() {
   }
   return (
     <GeneratorScreen
-      profile={profile}
+      profile={profile || DEFAULT_PROFILE}
       history={history}
       setHistory={setHistory}
       onEditProfile={() => setScreen("editProfile")}
