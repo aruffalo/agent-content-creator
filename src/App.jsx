@@ -55,6 +55,16 @@ function loadHistory() {
 function saveHistory(history) {
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch {}
 }
+
+const LISTINGS_KEY = "resh_listings";
+
+function loadListings() {
+  try { const v = localStorage.getItem(LISTINGS_KEY); return v ? JSON.parse(v) : []; }
+  catch { return []; }
+}
+function saveListings(listings) {
+  try { localStorage.setItem(LISTINGS_KEY, JSON.stringify(listings)); } catch {}
+}
 // ─── BETA ACCESS GATE ─────────────────────────────────────────────────────────
 // Set VITE_BETA_ACCESS_CODE in Vercel to require a code to use the app.
 // Change the value (and redeploy) at any time to instantly lock out everyone
@@ -270,6 +280,103 @@ Reference their specific market, neighborhoods, and price ranges where relevant.
     .replace(/```\s*/g, "")
     .trim();
 
+  const first = cleaned.indexOf("{");
+  const last  = cleaned.lastIndexOf("}");
+  if (first === -1 || last === -1) throw new Error("Could not parse content — please try again.");
+
+  try {
+    return JSON.parse(cleaned.slice(first, last + 1));
+  } catch {
+    throw new Error("Content formatting error — please try again.");
+  }
+}
+
+// ─── LISTINGS & MARKETING ──────────────────────────────────────────────────────
+const LISTING_CONTENT_TYPES = [
+  { id: "description", label: "Listing Description", icon: "📝", desc: "MLS-ready + a punchier social version" },
+  { id: "justListed",  label: "Just Listed",         icon: "🆕", desc: "Announcement post for a new listing" },
+  { id: "openHouse",   label: "Open House",          icon: "🚪", desc: "Promote an upcoming open house" },
+  { id: "justSold",    label: "Just Sold",           icon: "🎉", desc: "Celebrate a closed sale" },
+  { id: "flyer",       label: "Flyer Copy",          icon: "📄", desc: "Text content for a printable one-sheet" },
+];
+
+async function generateListingContent({ listing, contentType, profile }) {
+  const typeInstructions = {
+    description: `Write a listing description for this property. Return a JSON object with:
+- mls (string): a professional, MLS-ready description, 100-150 words, factual and polished
+- social (string): a punchier, more casual version for a social caption, 40-70 words
+- cta (string): a short call-to-action line, e.g. "DM me to schedule a showing"`,
+    justListed: `Write a "Just Listed" announcement. Return a JSON object with:
+- headline (string): an exciting hook under 10 words announcing the new listing
+- body (string): 40-70 word announcement post highlighting the property's best features
+- cta (string): a short call-to-action line`,
+    openHouse: `Write an open house promotion. Return a JSON object with:
+- headline (string): an inviting hook under 10 words
+- body (string): 40-70 word post encouraging people to attend, mention the property's appeal
+- cta (string): a short call-to-action line mentioning to check the agent's page/DM for date & time details`,
+    justSold: `Write a "Just Sold" celebration post. Return a JSON object with:
+- headline (string): a celebratory hook under 10 words
+- body (string): 40-70 word post celebrating the sale, can mention gratitude to clients without naming them
+- cta (string): a short call-to-action line inviting people to reach out if they're thinking of buying/selling`,
+    flyer: `Write text content for a printable listing flyer. Return a JSON object with:
+- headline (string): a bold headline for the top of the flyer
+- body (string): 60-100 word description in a polished, print-ready tone
+- highlights (array of 3-5 strings): short bullet-point feature highlights (e.g. "3 Bedrooms", "Updated Kitchen")
+- cta (string): a short call-to-action line for the bottom of the flyer`,
+  };
+
+  const voiceDesc     = profile.voiceTags?.length ? `Voice descriptors: ${profile.voiceTags.join(", ")}.` : "";
+  const featuresLine   = listing.features?.trim() ? `Key features: ${listing.features}.` : "";
+
+  const systemPrompt = `You are a real estate content strategist writing property-specific marketing content for a real estate agent. Write in their voice as if you ARE them — not describing them.
+
+AGENT PROFILE:
+Name: ${profile.name || "the agent"}
+Brokerage: ${profile.brokerage || ""}
+Market: ${profile.market || "their local market"}
+${voiceDesc}
+
+PROPERTY DETAILS:
+Address: ${listing.address || "the property"}
+${listing.city ? `City/Area: ${listing.city}` : ""}
+${listing.beds ? `Bedrooms: ${listing.beds}` : ""}
+${listing.baths ? `Bathrooms: ${listing.baths}` : ""}
+${listing.sqft ? `Square footage: ${listing.sqft}` : ""}
+${listing.price ? `Price: ${listing.price}` : ""}
+${featuresLine}
+${listing.status ? `Listing status: ${listing.status}` : ""}
+
+${typeInstructions[contentType]}
+
+CRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Pure JSON object only.
+Write all content as if the agent is speaking directly — use "I", "my", "we" naturally.
+Never invent facts about the property beyond what's provided above.`;
+
+  const response = await fetch("/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1200,
+      system: systemPrompt,
+      messages: [{ role: "user", content: `Generate the ${contentType} content for this listing.` }],
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = (data.content || [])
+    .filter(b => b.type === "text")
+    .map(b => b.text || "")
+    .join("");
+
+  if (!text) throw new Error("Empty response — please try again.");
+
+  const cleaned = text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
   const first = cleaned.indexOf("{");
   const last  = cleaned.lastIndexOf("}");
   if (first === -1 || last === -1) throw new Error("Could not parse content — please try again.");
@@ -1135,7 +1242,7 @@ function DuplicateWarning({ matches, onContinue, onViewOriginal }) {
 }
 
 // ─── GENERATOR SCREEN ─────────────────────────────────────────────────────────
-function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHistory }) {
+function GeneratorScreen({ profile, onEditProfile, onViewHistory, onViewListings, history, setHistory }) {
   const [topic,           setTopic]           = useState("");
   const [contentType,     setContentType]     = useState("social");
   const [format,          setFormat]          = useState("reel");
@@ -1220,6 +1327,7 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
             </p>
           </div>
           <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
+            <button onClick={onViewListings} style={navBtnStyle}>Listings</button>
             <button onClick={onViewHistory} style={navBtnStyle}>
               History{history.length > 0 && <span style={{ color: "#2D2D2D", marginLeft: 3 }}>({history.length})</span>}
             </button>
@@ -1437,17 +1545,292 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
 }
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
+function ListingForm({ existing, onSave, onCancel }) {
+  const [form, setForm] = useState(existing || {
+    address: "", city: "", beds: "", baths: "", sqft: "", price: "", features: "", status: "active",
+  });
+
+  function update(key, value) { setForm(f => ({ ...f, [key]: value })); }
+
+  return (
+    <Block style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div>
+        <GoldLabel>Address</GoldLabel>
+        <input style={inputStyle} value={form.address} onChange={e => update("address", e.target.value)}
+          placeholder="123 Main St" />
+      </div>
+      <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ flex: 1 }}>
+          <GoldLabel>City / Area</GoldLabel>
+          <input style={inputStyle} value={form.city} onChange={e => update("city", e.target.value)}
+            placeholder="Tucson" />
+        </div>
+        <div style={{ flex: 1 }}>
+          <GoldLabel>Status</GoldLabel>
+          <select style={inputStyle} value={form.status} onChange={e => update("status", e.target.value)}>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="sold">Sold</option>
+          </select>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ flex: 1 }}>
+          <GoldLabel>Beds</GoldLabel>
+          <input style={inputStyle} value={form.beds} onChange={e => update("beds", e.target.value)} placeholder="3" />
+        </div>
+        <div style={{ flex: 1 }}>
+          <GoldLabel>Baths</GoldLabel>
+          <input style={inputStyle} value={form.baths} onChange={e => update("baths", e.target.value)} placeholder="2" />
+        </div>
+        <div style={{ flex: 1 }}>
+          <GoldLabel>Sq Ft</GoldLabel>
+          <input style={inputStyle} value={form.sqft} onChange={e => update("sqft", e.target.value)} placeholder="1,800" />
+        </div>
+        <div style={{ flex: 1 }}>
+          <GoldLabel>Price</GoldLabel>
+          <input style={inputStyle} value={form.price} onChange={e => update("price", e.target.value)} placeholder="$425,000" />
+        </div>
+      </div>
+      <div>
+        <GoldLabel>Key Features</GoldLabel>
+        <input style={inputStyle} value={form.features} onChange={e => update("features", e.target.value)}
+          placeholder="updated kitchen, mountain views, pool, corner lot..." />
+      </div>
+      <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+        <button
+          onClick={() => form.address.trim() && onSave(form)}
+          disabled={!form.address.trim()}
+          style={{
+            padding: "10px 18px", borderRadius: 8, border: "none",
+            background: form.address.trim() ? "#0891B2" : "rgba(0,0,0,0.15)",
+            color: "#FFFFFF", fontWeight: 700, fontSize: 12,
+            cursor: form.address.trim() ? "pointer" : "not-allowed",
+            fontFamily: "sans-serif",
+          }}
+        >{existing ? "Save Changes" : "Save Listing"}</button>
+        {onCancel && (
+          <button onClick={onCancel} style={navBtnStyle}>Cancel</button>
+        )}
+      </div>
+    </Block>
+  );
+}
+
+function ListingResult({ data, contentType }) {
+  if (!data) return null;
+  return (
+    <Block style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {contentType === "description" ? (
+        <>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <GoldLabel style={{ margin: 0 }}>MLS Description</GoldLabel>
+              <CopyBtn text={data.mls} />
+            </div>
+            <div style={{ whiteSpace: "pre-wrap" }}>{data.mls}</div>
+          </div>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <GoldLabel style={{ margin: 0 }}>Social Version</GoldLabel>
+              <CopyBtn text={data.social} />
+            </div>
+            <div style={{ whiteSpace: "pre-wrap" }}>{data.social}</div>
+          </div>
+        </>
+      ) : (
+        <>
+          {data.headline && (
+            <div style={{ fontWeight: 700, fontSize: 15 }}>{data.headline}</div>
+          )}
+          {data.body && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+              <div style={{ whiteSpace: "pre-wrap" }}>{data.body}</div>
+              <CopyBtn text={data.body} />
+            </div>
+          )}
+          {Array.isArray(data.highlights) && data.highlights.length > 0 && (
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+              {data.highlights.map((h, i) => <li key={i} style={{ marginBottom: 4 }}>{h}</li>)}
+            </ul>
+          )}
+        </>
+      )}
+      {data.cta && (
+        <div style={{ fontSize: 12, color: "#0891B2", fontWeight: 600 }}>{data.cta}</div>
+      )}
+    </Block>
+  );
+}
+
+function ListingsScreen({ profile, listings, setListings, onBack }) {
+  const [selectedId,  setSelectedId]  = useState(listings[0]?.id || null);
+  const [showForm,    setShowForm]    = useState(listings.length === 0);
+  const [contentType, setContentType] = useState("description");
+  const [loading,     setLoading]     = useState(false);
+  const [result,      setResult]      = useState(null);
+  const [error,       setError]       = useState("");
+
+  const activeListing = listings.find(l => l.id === selectedId) || null;
+
+  function handleSaveListing(form) {
+    let updated;
+    if (activeListing && !showForm) {
+      // editing existing
+      updated = listings.map(l => l.id === activeListing.id ? { ...l, ...form } : l);
+    } else if (activeListing && showForm) {
+      updated = listings.map(l => l.id === activeListing.id ? { ...l, ...form } : l);
+    } else {
+      const newListing = { ...form, id: Date.now() };
+      updated = [newListing, ...listings];
+      setSelectedId(newListing.id);
+    }
+    setListings(updated);
+    saveListings(updated);
+    setShowForm(false);
+    setResult(null);
+  }
+
+  function handleDeleteListing(id) {
+    const updated = listings.filter(l => l.id !== id);
+    setListings(updated);
+    saveListings(updated);
+    if (selectedId === id) {
+      setSelectedId(updated[0]?.id || null);
+      setShowForm(updated.length === 0);
+    }
+  }
+
+  async function handleGenerate() {
+    if (!activeListing || loading) return;
+    setLoading(true);
+    setResult(null);
+    setError("");
+    try {
+      const data = await generateListingContent({ listing: activeListing, contentType, profile });
+      setResult(data);
+    } catch (e) {
+      setError(e.message || "Generation failed — please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A", fontFamily: "sans-serif" }}>
+      <ScreenHeader title="Listings & Marketing" subtitle="Property-specific content, generated once per listing" onBack={onBack} />
+
+      <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
+
+        {/* Listing picker */}
+        {listings.length > 0 && (
+          <div>
+            <GoldLabel>Your Listings</GoldLabel>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {listings.map(l => (
+                <Tag
+                  key={l.id}
+                  active={selectedId === l.id && !showForm}
+                  onClick={() => { setSelectedId(l.id); setShowForm(false); setResult(null); setError(""); }}
+                >
+                  {l.address}{l.status === "sold" ? " · Sold" : l.status === "pending" ? " · Pending" : ""}
+                </Tag>
+              ))}
+              <Tag active={showForm && !activeListing} onClick={() => { setShowForm(true); setSelectedId(null); setResult(null); }}>
+                + New Listing
+              </Tag>
+            </div>
+          </div>
+        )}
+
+        {/* Form: new listing, or no listings yet */}
+        {(showForm || listings.length === 0) && !activeListing && (
+          <div>
+            {listings.length === 0 && <GoldLabel>Add Your First Listing</GoldLabel>}
+            <ListingForm
+              onSave={handleSaveListing}
+              onCancel={listings.length > 0 ? () => { setShowForm(false); setSelectedId(listings[0]?.id || null); } : null}
+            />
+          </div>
+        )}
+
+        {/* Active listing workspace */}
+        {activeListing && !showForm && (
+          <>
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <GoldLabel style={{ margin: 0 }}>Property Details</GoldLabel>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={() => setShowForm(true)} style={navBtnStyle}>Edit</button>
+                  <button onClick={() => handleDeleteListing(activeListing.id)} style={navBtnStyle}>Delete</button>
+                </div>
+              </div>
+              <Block style={{ fontSize: 12, color: "#555555" }}>
+                {activeListing.address}{activeListing.city ? `, ${activeListing.city}` : ""}
+                {" · "}{activeListing.beds || "?"} bd / {activeListing.baths || "?"} ba
+                {activeListing.sqft ? ` · ${activeListing.sqft} sqft` : ""}
+                {activeListing.price ? ` · ${activeListing.price}` : ""}
+              </Block>
+            </div>
+
+            <div>
+              <GoldLabel>Content Type</GoldLabel>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {LISTING_CONTENT_TYPES.map(ct => (
+                  <Tag key={ct.id} active={contentType === ct.id} onClick={() => { setContentType(ct.id); setResult(null); setError(""); }}>
+                    {ct.icon} {ct.label}
+                  </Tag>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={handleGenerate}
+              disabled={loading}
+              style={{
+                padding: "13px 20px", borderRadius: 10, border: "none",
+                background: loading ? "rgba(0,0,0,0.15)" : "#0891B2",
+                color: "#FFFFFF", fontWeight: 700, fontSize: 13,
+                cursor: loading ? "not-allowed" : "pointer",
+                fontFamily: "sans-serif",
+              }}
+            >{loading ? "Generating…" : "Generate Content"}</button>
+
+            {error && <div style={{ color: "#B91C1C", fontSize: 12 }}>{error}</div>}
+
+            {result && <ListingResult data={result} contentType={contentType} />}
+          </>
+        )}
+
+        {activeListing && showForm && (
+          <div>
+            <GoldLabel>Edit Listing</GoldLabel>
+            <ListingForm
+              existing={activeListing}
+              onSave={handleSaveListing}
+              onCancel={() => setShowForm(false)}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
-  const [screen,  setScreen]  = useState("loading");
-  const [profile, setProfile] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [screen,   setScreen]   = useState("loading");
+  const [profile,  setProfile]  = useState(null);
+  const [history,  setHistory]  = useState([]);
+  const [listings, setListings] = useState([]);
   const [hasAccess, setHasAccess] = useState(checkAccess());
 
   useEffect(() => {
     const p = loadProfile();
     const h = loadHistory();
+    const l = loadListings();
     setProfile(p);
     setHistory(h);
+    setListings(l);
     // Profile setup is now optional — always land on the generator.
     // Agents can personalize any time via the "Profile" button.
     setScreen("generator");
@@ -1483,6 +1866,16 @@ export default function App() {
       />
     );
   }
+  if (screen === "listings") {
+    return (
+      <ListingsScreen
+        profile={profile || DEFAULT_PROFILE}
+        listings={listings}
+        setListings={setListings}
+        onBack={() => setScreen("generator")}
+      />
+    );
+  }
   return (
     <GeneratorScreen
       profile={profile || DEFAULT_PROFILE}
@@ -1490,6 +1883,7 @@ export default function App() {
       setHistory={setHistory}
       onEditProfile={() => setScreen("editProfile")}
       onViewHistory={() => setScreen("history")}
+      onViewListings={() => setScreen("listings")}
     />
   );
 }
