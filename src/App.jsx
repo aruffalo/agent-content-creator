@@ -138,6 +138,47 @@ const PILLAR_OPTIONS = [
   { id: "trust",        label: "Agent POV",        icon: "💬" },
 ];
 
+// Tappable starting-point topics per pillar — closes the "blank page" gap
+// between picking a pillar/format and having to invent a topic from scratch.
+const TOPIC_SUGGESTIONS = {
+  neighborhood: [
+    "what makes this neighborhood special",
+    "hidden gem spots locals love",
+    "what's changed in this area in the last year",
+    "before/after: this block five years ago vs now",
+  ],
+  buyer: [
+    "why buyers lose bidding wars right now",
+    "down payment myths that stop people from buying",
+    "what to know before your first showing",
+    "questions buyers forget to ask at an open house",
+  ],
+  seller: [
+    "the #1 pricing mistake sellers make",
+    "why 'missing the peak' shouldn't scare sellers",
+    "what actually adds value before you list",
+    "how long homes are really sitting on the market right now",
+  ],
+  market: [
+    "what this month's market data actually means for you",
+    "is it a buyer's or seller's market right now",
+    "how interest rates are shaping decisions this year",
+    "what inventory levels mean for your next move",
+  ],
+  lifestyle: [
+    "a perfect Saturday in this town",
+    "best local spots for a date night",
+    "why people are moving to this area",
+    "what a typical week looks like living here",
+  ],
+  trust: [
+    "why I got into real estate",
+    "a lesson a past client taught me",
+    "what I wish every client knew before we started",
+    "the moment I knew this was the right career for me",
+  ],
+};
+
 const VOICE_TAGS = [
   "warm & approachable", "no-nonsense", "educational", "peer-authority",
   "luxury lifestyle", "first-time buyer focused", "relatable", "data-driven",
@@ -1265,6 +1306,35 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, history, setHi
         {/* Topic */}
         <div>
           <GoldLabel>Your Topic</GoldLabel>
+
+          {/* Suggested starting points — tap one to fill and generate instantly */}
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+            {(TOPIC_SUGGESTIONS[pillar] || []).map((suggestion, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setTopic(suggestion);
+                  setDupes(null);
+                  setPendingGenerate(false);
+                }}
+                style={{
+                  padding: "7px 12px",
+                  borderRadius: 999,
+                  border: "1px solid rgba(0,0,0,0.12)",
+                  background: "#FFFFFF",
+                  color: "#555555",
+                  fontSize: 11,
+                  fontFamily: "sans-serif",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+
           <div style={{ display: "flex" }}>
             <input
               value={topic}
