@@ -21,10 +21,27 @@ function isRateLimited(ip) {
 }
 
 // ─── ALLOWED ORIGINS ──────────────────────────────────────────────────────────
-const ALLOWED_ORIGINS = [
-  "https://app.realestatesolutionshub.com",
-  "https://agent-content-creator.vercel.app",
+// Matched by hostname (not exact string) so www/non-www variants and Vercel
+// preview-deployment URLs for this project both work without maintaining
+// an exact list of every possible URL.
+const ALLOWED_HOSTNAMES = [
+  "app.realestatesolutionshub.com",
+  "www.app.realestatesolutionshub.com",
 ];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true; // no Origin header — let it through (e.g. some same-origin requests)
+  let hostname;
+  try {
+    hostname = new URL(origin).hostname;
+  } catch {
+    return false;
+  }
+  if (ALLOWED_HOSTNAMES.includes(hostname)) return true;
+  // Any Vercel deployment of this project — production, preview, or branch URLs
+  if (hostname.startsWith("agent-content-creator") && hostname.endsWith(".vercel.app")) return true;
+  return false;
+}
 
 // ─── REQUEST VALIDATOR ────────────────────────────────────────────────────────
 function isValidRequest(body) {
@@ -49,7 +66,7 @@ export default async function handler(req, res) {
 
   // 2. Origin check — only allow requests from your own domains
   const origin = req.headers.origin || "";
-  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+  if (!isAllowedOrigin(origin)) {
     return res.status(403).json({ error: "Forbidden" });
   }
 
