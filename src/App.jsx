@@ -1242,7 +1242,7 @@ function DuplicateWarning({ matches, onContinue, onViewOriginal }) {
 }
 
 // ─── GENERATOR SCREEN ─────────────────────────────────────────────────────────
-function GeneratorScreen({ profile, onEditProfile, onViewHistory, onViewListings, history, setHistory }) {
+function GeneratorScreen({ profile, onViewHistory, history, setHistory }) {
   const [topic,           setTopic]           = useState("");
   const [contentType,     setContentType]     = useState("social");
   const [format,          setFormat]          = useState("reel");
@@ -1310,32 +1310,6 @@ function GeneratorScreen({ profile, onEditProfile, onViewHistory, onViewListings
 
   return (
     <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A", fontFamily: "sans-serif" }}>
-      {/* Header */}
-      <div style={{ background: "#FFFFFF", borderBottom: `1px solid ${B.border}`, padding: "16px 22px 14px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
-              <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
-                The Content Ready Agent
-              </h1>
-              <span style={{ fontSize: 9, color: "#0891B2", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>by RESH</span>
-            </div>
-            <p style={{ fontSize: 11, color: "#888888", margin: "2px 0 0" }}>
-              {profile.name
-                ? <>Writing as <span style={{ color: "#0891B2", fontWeight: 600 }}>{profile.name}</span>{profile.market ? ` · ${profile.market}` : ""}</>
-                : <>Writing with a generic voice — <span onClick={onEditProfile} style={{ color: "#0891B2", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>add your details</span> to personalize</>}
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
-            <button onClick={onViewListings} style={navBtnStyle}>Listings</button>
-            <button onClick={onViewHistory} style={navBtnStyle}>
-              History{history.length > 0 && <span style={{ color: "#2D2D2D", marginLeft: 3 }}>({history.length})</span>}
-            </button>
-            <button onClick={onEditProfile} style={navBtnStyle}>Profile</button>
-          </div>
-        </div>
-      </div>
-
       <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
 
         {/* Pillar */}
@@ -1663,7 +1637,7 @@ function ListingResult({ data, contentType }) {
   );
 }
 
-function ListingsScreen({ profile, listings, setListings, onBack }) {
+function ListingsScreen({ profile, listings, setListings }) {
   const [selectedId,  setSelectedId]  = useState(listings[0]?.id || null);
   const [showForm,    setShowForm]    = useState(listings.length === 0);
   const [contentType, setContentType] = useState("description");
@@ -1718,8 +1692,6 @@ function ListingsScreen({ profile, listings, setListings, onBack }) {
 
   return (
     <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A", fontFamily: "sans-serif" }}>
-      <ScreenHeader title="Listings & Marketing" subtitle="Property-specific content, generated once per listing" onBack={onBack} />
-
       <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
 
         {/* Listing picker */}
@@ -1817,6 +1789,87 @@ function ListingsScreen({ profile, listings, setListings, onBack }) {
   );
 }
 
+function SectionTab({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "12px 20px",
+        fontSize: 13,
+        fontWeight: 700,
+        fontFamily: "sans-serif",
+        color: active ? "#0891B2" : "#999999",
+        background: "transparent",
+        border: "none",
+        borderBottom: active ? "3px solid #0891B2" : "3px solid transparent",
+        cursor: "pointer",
+        transition: "color 0.15s, border-color 0.15s",
+        marginBottom: -1,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function MainScreen({ profile, onEditProfile, onViewHistory, history, setHistory, listings, setListings }) {
+  const [section, setSection] = useState("content");
+
+  return (
+    <div style={{ minHeight: "100vh", background: B.pageBg, color: "#1A1A1A", fontFamily: "sans-serif" }}>
+      {/* Shared header */}
+      <div style={{ background: "#FFFFFF", borderBottom: `1px solid ${B.border}`, padding: "16px 22px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", paddingBottom: 14 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
+              <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, fontFamily: "Georgia, serif", fontStyle: "italic", color: "#1A1A1A" }}>
+                The Content Ready Agent
+              </h1>
+              <span style={{ fontSize: 9, color: "#0891B2", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700 }}>by RESH</span>
+            </div>
+            <p style={{ fontSize: 11, color: "#888888", margin: "2px 0 0" }}>
+              {profile.name
+                ? <>Writing as <span style={{ color: "#0891B2", fontWeight: 600 }}>{profile.name}</span>{profile.market ? ` · ${profile.market}` : ""}</>
+                : <>Writing with a generic voice — <span onClick={onEditProfile} style={{ color: "#0891B2", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>add your details</span> to personalize</>}
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
+            <button onClick={onViewHistory} style={navBtnStyle}>
+              History{history.length > 0 && <span style={{ color: "#2D2D2D", marginLeft: 3 }}>({history.length})</span>}
+            </button>
+            <button onClick={onEditProfile} style={navBtnStyle}>Profile</button>
+          </div>
+        </div>
+
+        {/* Obvious top-level section tabs */}
+        <div style={{ display: "flex", gap: 6, borderTop: `1px solid ${B.border}`, paddingTop: 2 }}>
+          <SectionTab active={section === "content"} onClick={() => setSection("content")}>
+            ✨ Content Generator
+          </SectionTab>
+          <SectionTab active={section === "listings"} onClick={() => setSection("listings")}>
+            🏠 Listings &amp; Marketing
+          </SectionTab>
+        </div>
+      </div>
+
+      {section === "content" ? (
+        <GeneratorScreen
+          profile={profile}
+          history={history}
+          setHistory={setHistory}
+          onViewHistory={onViewHistory}
+        />
+      ) : (
+        <ListingsScreen
+          profile={profile}
+          listings={listings}
+          setListings={setListings}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [screen,   setScreen]   = useState("loading");
   const [profile,  setProfile]  = useState(null);
@@ -1866,24 +1919,15 @@ export default function App() {
       />
     );
   }
-  if (screen === "listings") {
-    return (
-      <ListingsScreen
-        profile={profile || DEFAULT_PROFILE}
-        listings={listings}
-        setListings={setListings}
-        onBack={() => setScreen("generator")}
-      />
-    );
-  }
   return (
-    <GeneratorScreen
+    <MainScreen
       profile={profile || DEFAULT_PROFILE}
       history={history}
       setHistory={setHistory}
+      listings={listings}
+      setListings={setListings}
       onEditProfile={() => setScreen("editProfile")}
       onViewHistory={() => setScreen("history")}
-      onViewListings={() => setScreen("listings")}
     />
   );
 }
