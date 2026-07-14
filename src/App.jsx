@@ -1212,7 +1212,7 @@ function DuplicateWarning({ matches, onContinue, onViewOriginal }) {
         ⚠️ SIMILAR TOPIC DETECTED
       </div>
       <div style={{ fontSize: 12, color: B.warmGray, marginBottom: 12, lineHeight: 1.6, fontFamily: "sans-serif" }}>
-        You've already created content on a similar topic:
+        You've already created a {matches[0]?.format} on a similar topic:
       </div>
       {matches.map((m, i) => (
         <div key={i} style={{
@@ -1220,7 +1220,7 @@ function DuplicateWarning({ matches, onContinue, onViewOriginal }) {
           marginBottom: 8, fontSize: 12, color: B.offWhite, fontFamily: "sans-serif",
         }}>
           <span style={{ fontWeight: 700, color: "#1A1A1A" }}>{m.topic}</span>
-          <span style={{ color: "#888888" }}> · {m.format} · {new Date(m.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+          <span style={{ color: "#888888" }}> · {new Date(m.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         </div>
       ))}
       <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
@@ -1269,6 +1269,7 @@ function GeneratorScreen({ profile, onViewHistory, history, setHistory }) {
     const words = topic.toLowerCase().split(/\s+/).filter(w => w.length > 3);
     if (!words.length) return [];
     return history.filter(item => {
+      if (item.format !== format) return false; // different format = intentional repurposing, not a duplicate
       const itemWords = item.topic.toLowerCase().split(/\s+/);
       const overlap = words.filter(w => itemWords.some(iw => iw.includes(w) || w.includes(iw)));
       return overlap.length >= Math.min(2, words.length);
